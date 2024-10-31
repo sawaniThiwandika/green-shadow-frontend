@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="stylesheets/dashboard-styles.css" rel="stylesheet">
+    <link href="stylesheets/dashboardStyles.css" rel="stylesheet">
+    <link href="stylesheets/dashboardStyles.css" rel="stylesheet">
 </head>
 <body>
 
@@ -40,24 +41,27 @@
         <h4>Welcome to Green Shadow</h4>
         <button class="btn btn-light" id="logOutBtn">Logout</button>
     </div>
-
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm">
-                <h5>Total Crops</h5>
-                <p class="display-6">150</p>
+    <!--  Dashboard section-->
+    <section id="dashboardSection">
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card p-3 shadow-sm">
+                    <h5>Total Crops</h5>
+                    <p class="display-6">150</p>
+                </div>
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card p-3 shadow-sm">
-                <h5>Total Vehicles</h5>
+            <div class="col-md-4">
+                <div class="card p-3 shadow-sm">
+                    <h5>Total Vehicles</h5>
                 <p class="display-6">300</p>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card p-3 shadow-sm">
-                <h5>Monthly Revenue</h5>
-                <p class="display-6">$10,000</p>
+                <h5>Date</h5>
+                <p class="display-6" id="date"></p>
+                <h5>Time</h5>
+                <p class="display-6" id="time"></p>
             </div>
         </div>
     </div>
@@ -77,26 +81,90 @@
                 <div class="d-grid gap-2 mt-3">
                     <a href="#" class="btn btn-outline-success">Add New Crop</a>
                     <a href="#" class="btn btn-outline-success">Add New Log</a>
-                    <a href="#" class="btn btn-outline-success">Generate Field</a>
+                    <a href="#" class="btn btn-outline-success">Add new Equipment</a>
                 </div>
             </div>
         </div>
     </div>
+    </section>
+
+  <!--  Crop section-->
+    <section id="cropsSection" style="display: none">
+        <div class="container my-5">
+            <h3 class="text-center" id="cropsHeader">Crops Management</h3>
+
+            <div class="text-center my-3">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCropModal"
+                        id="addNewCrop">
+                    Add New Crop
+
+                </button>
+            </div>
+            <!--cards container-->
+            <div class="row" id="cropContainer">
+            </div>
+
+        </div>
+
+        <!--modal-->
+        <div class="modal fade" id="addCropModal" tabindex="-1" aria-labelledby="addCropModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCropModalLabel">Add New Crop</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="cropForm">
+                            <div class="mb-3">
+                                <label for="cropCode" class="form-label">Crop Code</label>
+                                <input type="text" class="form-control" id="cropCode"
+                                       placeholder="Enter unique crop code" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="commonName" class="form-label">Common Name</label>
+                                <input type="text" class="form-control" id="commonName"
+                                       placeholder="Enter common name of the crop" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="scientificName" class="form-label">Scientific Name</label>
+                                <input type="text" class="form-control" id="scientificName"
+                                       placeholder="Enter scientific name of the crop" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cropImage" class="form-label">Crop Image URL</label>
+                                <input type="text" class="form-control" id="cropImage" placeholder="Enter image URL"
+                                       required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="category" class="form-label">Category</label>
+                                <input type="text" class="form-control" id="category"
+                                       placeholder="Enter category (e.g., Cereal)" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="season" class="form-label">Season</label>
+                                <input type="text" class="form-control" id="season"
+                                       placeholder="Enter season of the crop" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fieldDetails" class="form-label">Field Details</label>
+                                <textarea class="form-control" id="fieldDetails" rows="2"
+                                          placeholder="Enter field details" required></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100" id="submitCrop">Add Crop</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-
-    document.getElementById('toggleSidebar').addEventListener('click', function () {
-        document.getElementById('sidebar').classList.add('show');
-        document.getElementById('closeSidebar').classList.add('show');
-        document.getElementById('closeSidebar').style.color = 'black';
-    });
-    document.getElementById('closeSidebar').addEventListener('click', function () {
-        document.getElementById('sidebar').classList.remove('show');
-    });
-</script>
+<script src="assets/lib/jquery-3.7.1.min.js"></script>
 <script type="module" src="controller/DashboardController.js"></script>
+<script type="module" src="controller/CropContainer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

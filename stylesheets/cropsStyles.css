@@ -1,0 +1,27 @@
+body {
+    background-color: #e8f5e9;
+}
+.card {
+    border: 1px solid #4caf50;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.5);
+    margin-bottom: 20px;
+}
+#addNewCrop{
+    background-color: #4caf50;
+    border: none;
+}
+#submitCrop {
+    background-color: #4caf50;
+    border: none;
+}
+#addNewCrop:hover, #submitCrop:hover {
+    background-color: #388e3c;
+}
+#cropsHeader, h4 {
+    color: #4caf50;
+}
+.crop-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
