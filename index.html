@@ -33,18 +33,18 @@
         </div>
         <form id="signInForm">
             <div class="mb-3">
-                <label for="email" class="form-label">Email Address</label>
-                <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+                <label for="emailLogin" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="emailLogin" placeholder="Enter your email" required>
             </div>
             <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+                <label for="passwordLogin" class="form-label">Password</label>
+                <input type="password" class="form-control" id="passwordLogin" placeholder="Enter your password" required>
             </div>
             <div class="form-check mb-3">
                 <input type="checkbox" class="form-check-input" id="remember">
                 <label class="form-check-label" for="remember">Remember me</label>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <button type="submit" class="btn btn-primary w-100" id="loginBtn"  >Login</button>
             <div class="text-center mt-3">
                 <small>Don't have an account? <a href="#" onclick="showSignUp()">Sign up</a></small>
             </div>
@@ -57,7 +57,7 @@
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email Address</label>
-                <input type="email" class="form-control" id="signupEmail" placeholder="Enter your email" required>
+                <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
             </div>
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
@@ -65,7 +65,7 @@
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="signupPassword" placeholder="Create a password" required>
+                <input type="password" class="form-control" id="Password" placeholder="Create a password" required>
             </div>
             <div class="mb-3">
                 <label for="confirmPassword" class="form-label">Confirm Password</label>
@@ -93,6 +93,6 @@
         document.getElementById('formTitle').innerText = 'Sign In';
     }
 </script>
-
+<script type="module" src="controller/LoginPageController.js"></script>
 </body>
 </html>
