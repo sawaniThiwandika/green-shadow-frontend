@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Shadow Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #e8f5e9;
+        }
+        .card {
+            border: 1px solid #4caf50;
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.5);
+        }
+        .btn-primary {
+            background-color: #4caf50; border: none;
+        }
+        .btn-primary:hover {
+            background-color: #388e3c;
+        }
+        .text-center h3 {
+            color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+<div class="container vh-100 d-flex align-items-center justify-content-center">
+    <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
+        <div class="text-center mb-4">
+            <img src="assets/images/Green_and_White_Modern_Simple_Herbal_Shop_Logo-removebg-preview.png" alt="Farm Logo" height="120" class="mb-3">
+            <h3 id="formTitle">Sign In</h3>
+        </div>
+        <form id="signInForm">
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="email" placeholder="Enter your email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+            </div>
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="remember">
+                <label class="form-check-label" for="remember">Remember me</label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <div class="text-center mt-3">
+                <small>Don't have an account? <a href="#" onclick="showSignUp()">Sign up</a></small>
+            </div>
+        </form>
+
+        <form id="signUpForm" style="display: none;">
+            <div class="mb-3">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="name" placeholder="Enter your full name" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address</label>
+                <input type="email" class="form-control" id="signupEmail" placeholder="Enter your email" required>
+            </div>
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" placeholder="Choose a username" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="signupPassword" placeholder="Create a password" required>
+            </div>
+            <div class="mb-3">
+                <label for="confirmPassword" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirmPassword" placeholder="Re-enter your password" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Sign Up</button>
+            <div class="text-center mt-3">
+                <small>Already have an account? <a href="#" onclick="showSignIn()">Sign in</a></small>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function showSignUp() {
+        document.getElementById('signInForm').style.display = 'none';
+        document.getElementById('signUpForm').style.display = 'block';
+        document.getElementById('formTitle').innerText = 'Sign Up';
+    }
+
+    function showSignIn() {
+        document.getElementById('signInForm').style.display = 'block';
+        document.getElementById('signUpForm').style.display = 'none';
+        document.getElementById('formTitle').innerText = 'Sign In';
+    }
+</script>
+
+</body>
+</html>
