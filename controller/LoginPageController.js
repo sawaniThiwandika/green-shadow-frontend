@@ -3,6 +3,8 @@ const users = [
     { email: "thiwandika.whs@gmail.com", password: "123" }
 ];
 
+document.querySelector('#loginBtn').addEventListener('click', handleLogin);
+
 function checkCredentials(email, password) {
     return users.some(user => user.email === email && user.password === password);
 }
@@ -22,4 +24,5 @@ function handleLogin(event) {
     }
 }
 
-document.querySelector('#loginBtn').addEventListener('click', handleLogin);
+
+
