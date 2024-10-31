@@ -55,6 +55,15 @@
     height: 120px;
     background-color:#e8f5e9 ;
 }
+#navLinksDiv{
+    position:absolute;
+    top:125px;
+    left:0;
+    right: 0;
+    margin: auto;
+    width: 220px;
+    height: 120px;
+}
 @media (min-width: 768px) {
     .sidebar {
         transform: translateX(0);
