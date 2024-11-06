@@ -22,12 +22,12 @@
    <div id="navLinksDiv">
        <a href="#" id="navDashboard">Dashboard</a>
        <a href="#" id="navCrops">Crops</a>
-       <a href="#">Fields</a>
-       <a href="#">Logs</a>
-       <a href="#">Equipment</a>
-       <a href="#">Staff</a>
-       <a href="#">Vehicles</a>
-       <a href="#">User</a>
+       <a href="#" id="navFields">Fields</a>
+       <a href="#" id="navLogs">Logs</a>
+       <a href="#" id="navEquipment">Equipment</a>
+       <a href="#" id="navStaff">Staff</a>
+       <a href="#" id="navVehicle">Vehicles</a>
+       <a href="#" id="navUser">User</a>
    </div>
 
 
@@ -158,6 +158,92 @@
             </div>
         </div>
     </section>
+
+    <section id="fieldsSection" style="display: none">
+        <div class="container my-5">
+            <h3 class="text-center" id="fieldsHeader">Field Management</h3>
+
+            <div class="text-center my-3">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFieldModal"
+                        id="addNewField">
+                    Add New Field
+                </button>
+            </div>
+
+            <!-- Field Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped" id="fieldTable">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Field Code</th>
+                        <th>Field Name</th>
+                        <th>Location (GPS)</th>
+                        <th>Extent (Sq. m)</th>
+                        <th>Available Crops</th>
+                        <th>Allocated Staff</th>
+                        <th>Field Image 1</th>
+                        <th>Field Image 2</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="fieldContainer">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Field Modal -->
+        <div class="modal fade" id="addFieldModal" tabindex="-1" aria-labelledby="addFieldModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addFieldModalLabel">Add New Field</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="fieldForm">
+                            <div class="mb-3">
+                                <label for="fieldCode" class="form-label">Field Code</label>
+                                <input type="text" class="form-control" id="fieldCode" placeholder="Enter unique field code" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fieldName" class="form-label">Field Name</label>
+                                <input type="text" class="form-control" id="fieldName" placeholder="Enter field name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Field Location (Coordinate)</label>
+                                <input type="text" class="form-control" id="location" placeholder="Enter GPS coordinates (e.g., 40.7128,-74.0060)" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="extent" class="form-label">Extent (Sq. m)</label>
+                                <input type="number" class="form-control" id="extent" placeholder="Enter extent in square meters" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="crops" class="form-label">Available Crop Types</label>
+                                <input type="text" class="form-control" id="crops" placeholder="Enter crop types (comma-separated)" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="staff" class="form-label">Allocated Staff</label>
+                                <input type="text" class="form-control" id="staff" placeholder="Enter allocated staff (comma-separated)" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fieldImage1" class="form-label">Field Image 1 (URL)</label>
+                                <input type="text" class="form-control" id="fieldImage1" placeholder="Enter image URL" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fieldImage2" class="form-label">Field Image 2 (URL)</label>
+                                <input type="text" class="form-control" id="fieldImage2" placeholder="Enter second image URL" required>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100" id="submitField">Add Field</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
 
 </div>
 

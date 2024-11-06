@@ -30,12 +30,20 @@ $('#closeSidebar').on('click', function () {
 });
 // navigate to pages
 $('#navCrops').on('click', () => {
-    $('#dashboardSection').css('display', 'none');
     $('#cropsSection').css('display', 'block');
+    $('#dashboardSection').css('display', 'none');
+    $('#fieldsSection').css('display', 'none');
     console.log("clicked");
 });
 $('#navDashboard').on('click', () => {
     $('#dashboardSection').css('display', 'block');
+    $('#cropsSection').css('display', 'none');
+    $('#fieldsSection').css('display', 'none');
+    console.log("clicked");
+});
+$('#navFields').on('click', () => {
+    $('#fieldsSection').css('display', 'block');
+    $('#dashboardSection').css('display', 'none');
     $('#cropsSection').css('display', 'none');
     console.log("clicked");
 });
