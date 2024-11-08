@@ -41,7 +41,7 @@ $('#staffForm').on('submit', function(event) {
                 <button class="btn btn-info btn-sm view-details" data-bs-toggle="modal" data-bs-target="#addStaffModal">Update</button>
             </td>
              <td>
-                <button class="btn btn-info btn-sm view-details" data-bs-toggle="modal" data-bs-target="#addStaffModal">Delete</button>
+                <button class="btn btn-danger btn-sm delete-staff" data-bs-toggle="modal">Delete</button>
             </td>
         </tr>
     `);
@@ -52,7 +52,26 @@ $('#staffForm').on('submit', function(event) {
     $('#staffForm')[0].reset();
     $('#addStaffModal').modal('hide');
 });
+$('#addNewStaff').on('click', function() {
+    $('#addStaffModalLabel').text('Add Staff');
+    $('#submitBtnModal').text('Add Staff');
+    $('#staffForm')[0].reset();
+    $('#addStaffModal').modal('show');
+});
+// Delete Staff Mem
+$(document).on('click', '.delete-staff', function() {
+    const row = $(this).closest('tr');
+    const staffId = row.data('staff-id');
+    const confirmDelete = confirm("Are you sure you want to delete this staff member?");
+    if (confirmDelete) {
+        row.remove();
+        if (staffList[staffId]) {
+            delete staffList[staffId];
+        }
 
+        console.log("Staff member deleted with ID:", staffId);
+    }
+});
 // View full details
 $(document).on('click', '.view-details', function() {
     const row = $(this).closest('tr');
@@ -80,6 +99,9 @@ $(document).on('click', '.view-details', function() {
     $('#role').val(selectedStaff.role);
     $('#fields').val(selectedStaff.fields);
     $('#vehicle').val(selectedStaff.vehicle);
+
+    $('#addStaffModalLabel').text('Update Staff');
+    $('#submitBtnModal').text('Update Staff');
 
 
     $('#addStaffModal').modal('show');
