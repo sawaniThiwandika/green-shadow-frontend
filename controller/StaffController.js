@@ -56,7 +56,9 @@ $('#staffForm').on('submit', function(event) {
 // View full details
 $(document).on('click', '.view-details', function() {
     const row = $(this).closest('tr');
-    let selectedStaff = staffList[0];
+
+    console.log("row: " + row.index());
+    let selectedStaff = staffList[row.index()];
     $('#staffId').val(selectedStaff.id);
     $('#firstName').val(selectedStaff.firstName);
     $('#lastName').val(selectedStaff.lastName);
@@ -83,15 +85,17 @@ $(document).on('click', '.view-details', function() {
     $('#addStaffModal').modal('show');
 });
 
-function  validateStaff(){
+//Validation
 
-     let isValid = true;
-     const errorMessage = [];
+function validateStaff() {
 
-     const staffId = $('#staffId').val();
-     const firstName = $('#firstName').val();
-     const lastName = $('#lastName').val();
-     const designation = $('#designation').val();
+    let isValid = true;
+    const errorMessage = [];
+
+    const staffId = $('#staffId').val();
+    const firstName = $('#firstName').val();
+    const lastName = $('#lastName').val();
+    const designation = $('#designation').val();
      const gender = $('#gender').val();
      const joinedDate = $('#joinedDate').val();
      const dob = $('#dob').val();
@@ -163,6 +167,7 @@ function  validateStaff(){
         isValid =  false;
     }
 
-     return isValid;
+
+    return isValid;
 
  }
