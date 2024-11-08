@@ -369,6 +369,90 @@
 
     </section>
 
+  <!--  Log Section-->
+
+    <!-- Logs Section -->
+    <!-- Logs Section -->
+    <section id="logsSection" style="display: none;">
+        <div class="container my-5">
+            <h3 class="text-center" id="logsHeader">Logs Management</h3>
+
+            <div class="text-center my-3">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#logModal" id="addNewLog">
+                    Add New Log
+                </button>
+            </div>
+
+            <!-- Logs Table -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Log ID</th>
+                        <th>Date</th>
+                        <th>Activity</th>
+                        <th>Responsible Staff</th>
+                        <th>Details</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="logsContainer">
+                    <!-- Log entries will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Log Modal (For both Add and Update) -->
+        <div class="modal fade" id="logModal" tabindex="-1" aria-labelledby="logModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="logModalLabel">Add New Log</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="logForm">
+                            <div class="mb-3">
+                                <label for="logId" class="form-label">Log ID</label>
+                                <input type="text" class="form-control" id="logId" placeholder="Enter unique Log ID" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="logDate" class="form-label">Date</label>
+                                <input type="date" class="form-control" id="logDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="activity" class="form-label">Activity</label>
+                                <input type="text" class="form-control" id="activity" placeholder="Enter activity" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="staffOfLog" class="form-label">Responsible Staff</label>
+                                <input type="text" class="form-control" id="staffOfLog" placeholder="Enter staff responsible" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="cropOfLog" class="form-label">Crop List</label>
+                                <input type="text" class="form-control" id="cropOfLog" placeholder="Enter crop responsible" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="fieldOfLog" class="form-label">Field List</label>
+                                <input type="text" class="form-control" id="fieldOfLog" placeholder="Enter Field responsible" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="details" class="form-label">Details</label>
+                                <textarea class="form-control" id="details" rows="3" placeholder="Enter details" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="observedImage" class="form-label">Observed Image (optional)</label>
+                                <input type="file" class="form-control" id="observedImage" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn btn-success w-100" id="submitLog">Add Log</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
 
 
@@ -382,6 +466,7 @@
 <script type="module" src="controller/CropController.js"></script>
 <script type="module" src="controller/StaffController.js"></script>
 <script type="module" src="controller/FieldController.js"></script>
+<script type="module" src="controller/LogController.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

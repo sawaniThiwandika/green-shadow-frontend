@@ -31,6 +31,7 @@ $('#closeSidebar').on('click', function () {
 // navigate to pages
 $('#navCrops').on('click', () => {
     $('#cropsSection').css('display', 'block');
+    $('#logsSection').css('display', 'none');
     $('#dashboardSection').css('display', 'none');
     $('#fieldsSection').css('display', 'none');
     $('#staffSection').css('display', 'none');
@@ -38,6 +39,7 @@ $('#navCrops').on('click', () => {
 });
 $('#navDashboard').on('click', () => {
     $('#dashboardSection').css('display', 'block');
+    $('#logsSection').css('display', 'none');
     $('#cropsSection').css('display', 'none');
     $('#fieldsSection').css('display', 'none');
     $('#staffSection').css('display', 'none');
@@ -45,6 +47,7 @@ $('#navDashboard').on('click', () => {
 });
 $('#navFields').on('click', () => {
     $('#fieldsSection').css('display', 'block');
+    $('#logsSection').css('display', 'none');
     $('#dashboardSection').css('display', 'none');
     $('#cropsSection').css('display', 'none');
     $('#staffSection').css('display', 'none');
@@ -52,6 +55,15 @@ $('#navFields').on('click', () => {
 });
 $('#navStaff').on('click', () => {
     $('#staffSection').css('display', 'block');
+    $('#fieldsSection').css('display', 'none');
+    $('#logsSection').css('display', 'none');
+    $('#dashboardSection').css('display', 'none');
+    $('#cropsSection').css('display', 'none');
+    console.log("clicked");
+});
+$('#navLogs').on('click', () => {
+    $('#logsSection').css('display', 'block');
+    $('#staffSection').css('display', 'none');
     $('#fieldsSection').css('display', 'none');
     $('#dashboardSection').css('display', 'none');
     $('#cropsSection').css('display', 'none');
