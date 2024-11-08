@@ -22,13 +22,41 @@ $('#staffForm').on('submit', function(event) {
     const fields = $('#fields').val();
     const vehicle = $('#vehicle').val();
 
-    //let validateStaff = validateStaff();
+    const existingRow = $(`#staffContainer tr[data-staff-id="${staffId}"]`);
 
+    //Update staff
+    if (existingRow.length > 0) {
+        existingRow.find('td').eq(1).text(`${firstName} ${lastName}`);
+        existingRow.find('td').eq(2).text(contactNo);
+        existingRow.find('td').eq(3).text(email);
 
+        let existingStaff = staffList.find(staff => staff.staffId === staffId);
+        if (existingStaff) {
+            existingStaff.firstName = firstName;
+            existingStaff.lastName = lastName;
+            existingStaff.designation = designation;
+            existingStaff.gender = gender;
+            existingStaff.joinedDate = joinedDate;
+            existingStaff.dob = dob;
+            existingStaff.addressLine1 = addressLine1;
+            existingStaff.addressLine2 = addressLine2;
+            existingStaff.addressLine3 = addressLine3;
+            existingStaff.addressLine4 = addressLine4;
+            existingStaff.addressLine5 = addressLine5;
+            existingStaff.contactNo = contactNo;
+            existingStaff.email = email;
+            existingStaff.role = role;
+            existingStaff.fields = fields;
+            existingStaff.vehicle = vehicle;
+        }
+    }
+    // add new staff
+    else {
+        //let validateStaff = validateStaff();
 
-    //if(validateStaff){
-         staffList.push(new StaffModel(staffId,firstName,lastName,designation,gender,joinedDate,dob,contactNo,email,addressLine1,addressLine2,addressLine3,
-             addressLine4,addressLine5,role,fields,vehicle));
+        //if(validateStaff){
+        staffList.push(new StaffModel(staffId, firstName, lastName, designation, gender, joinedDate, dob, contactNo, email, addressLine1, addressLine2, addressLine3,
+            addressLine4, addressLine5, role, fields, vehicle));
 
         // Append to staff table
         $('#staffContainer').append(`
@@ -44,7 +72,9 @@ $('#staffForm').on('submit', function(event) {
                 <button class="btn btn-danger btn-sm delete-staff" data-bs-toggle="modal">Delete</button>
             </td>
         </tr>
+        }
     `);
+    }
 
    //}
 
