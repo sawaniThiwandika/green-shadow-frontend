@@ -1,5 +1,5 @@
 import {CropModel} from "../model/CropModel.js";
-import {cropList} from "../Db/db";
+import {cropList} from "../Db/db.js";
 $('#cropForm').on('submit', function(event) {
     event.preventDefault();
 

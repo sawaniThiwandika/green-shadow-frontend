@@ -33,18 +33,29 @@ $('#navCrops').on('click', () => {
     $('#cropsSection').css('display', 'block');
     $('#dashboardSection').css('display', 'none');
     $('#fieldsSection').css('display', 'none');
+    $('#staffSection').css('display', 'none');
     console.log("clicked");
 });
 $('#navDashboard').on('click', () => {
     $('#dashboardSection').css('display', 'block');
     $('#cropsSection').css('display', 'none');
     $('#fieldsSection').css('display', 'none');
+    $('#staffSection').css('display', 'none');
     console.log("clicked");
 });
 $('#navFields').on('click', () => {
     $('#fieldsSection').css('display', 'block');
     $('#dashboardSection').css('display', 'none');
     $('#cropsSection').css('display', 'none');
+    $('#staffSection').css('display', 'none');
     console.log("clicked");
 });
+$('#navStaff').on('click', () => {
+    $('#staffSection').css('display', 'block');
+    $('#fieldsSection').css('display', 'none');
+    $('#dashboardSection').css('display', 'none');
+    $('#cropsSection').css('display', 'none');
+    console.log("clicked");
+});
+
 
