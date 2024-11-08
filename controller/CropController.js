@@ -1,5 +1,8 @@
 import {CropModel} from "../model/CropModel.js";
 import {cropList} from "../Db/db.js";
+let editCropId = null; // To keep track of the crop being edited
+
+// Form submit event handler
 $('#cropForm').on('submit', function(event) {
     event.preventDefault();
 
@@ -9,7 +12,6 @@ $('#cropForm').on('submit', function(event) {
     const category = $('#category').val();
     const season = $('#season').val();
     const fieldDetails = $('#fieldDetails').val();
-
     const file = $('#cropImage')[0].files[0];
 
     if (file) {
@@ -17,26 +19,56 @@ $('#cropForm').on('submit', function(event) {
 
         reader.onload = function(e) {
             const cropImage = e.target.result;
-            cropList.push(new CropModel(cropCode, commonName, scientificName, category, season, cropImage));
 
-            const cropContainer = $('#cropContainer');
-            const cropCard = `
-                <div class="col-md-4">
-                    <div class="card">
-                        <img src="${cropImage}" alt="${commonName}" class="card-img-top crop-img">
-                        <div class="card-body">
-                            <h5 class="card-title">${commonName}</h5>
-                            <p><strong>Code:</strong> ${cropCode}</p>
-                            <p><strong>Scientific Name:</strong> ${scientificName}</p>
-                            <p><strong>Category:</strong> ${category}</p>
-                            <p><strong>Season:</strong> ${season}</p>
-                            <p><strong>Field Details:</strong> ${fieldDetails}</p>
+            if (editCropId !== null) {
+                // Update existing crop
+                const crop = cropList.find(c => c.code === editCropId);
+                crop.cropCode = cropCode;
+                crop.cropName = commonName;
+                crop.cropScientificName = scientificName;
+                crop.cropCategory = category;
+                crop.cropSeason = season;
+                crop.fieldDetails = fieldDetails;
+                crop.cropImage = cropImage;
+
+                // Update the crop card in the DOM
+                const cropCard = $(`[data-crop-id="${editCropId}"]`);
+                cropCard.find('.card-img-top').attr('src', cropImage);
+                cropCard.find('.card-title').text(commonName);
+                cropCard.find('p:nth-child(3)').text(`Code: ${cropCode}`);
+                cropCard.find('p:nth-child(4)').text(`Scientific Name: ${scientificName}`);
+                cropCard.find('p:nth-child(5)').text(`Category: ${category}`);
+                cropCard.find('p:nth-child(6)').text(`Season: ${season}`);
+                cropCard.find('p:nth-child(7)').text(`Field Details: ${fieldDetails}`);
+
+                editCropId = null;  // Reset edit mode
+            } else {
+                // Add new crop
+                cropList.push(new CropModel(cropCode, commonName, scientificName, category, season, cropImage));
+
+                const cropContainer = $('#cropContainer');
+                const cropCard = `
+                    <div class="col-md-4" data-crop-id="${cropCode}">
+                        <div class="card">
+                            <img src="${cropImage}" alt="${commonName}" class="card-img-top crop-img">
+                            <div class="card-body">
+                                <h5 class="card-title">${commonName}</h5>
+                                <p><strong>Code:</strong> ${cropCode}</p>
+                                <p><strong>Scientific Name:</strong> ${scientificName}</p>
+                                <p><strong>Category:</strong> ${category}</p>
+                                <p><strong>Season:</strong> ${season}</p>
+                                <p><strong>Field Details:</strong> ${fieldDetails}</p>
+                                <button class="btn btn-primary btn-sm update-crop">Update</button>
+                                <button class="btn btn-danger btn-sm delete-crop">Delete</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
+                `;
 
-            cropContainer.append(cropCard);
+                cropContainer.append(cropCard);
+            }
+
+            // Reset the form and hide the modal
             $('#cropForm')[0].reset();
             $('#addCropModal').modal('hide');
         };
@@ -45,6 +77,37 @@ $('#cropForm').on('submit', function(event) {
     } else {
         alert("Please upload an image.");
     }
+});
+
+// Update Crop - Button Click Event
+$(document).on('click', '.update-crop', function() {
+    const cropId = $(this).closest('.col-md-4').data('crop-id');
+    const cropData = cropList.find(crop => crop.code === cropId);
+
+    $('#cropCode').val(cropData.code);
+    $('#commonName').val(cropData.name);
+    $('#scientificName').val(cropData.scientificName);
+    $('#category').val(cropData.category);
+    $('#season').val(cropData.season);
+    $('#fieldDetails').val(cropData.fieldDetails);
+
+    // Set the edit mode with the crop ID
+    editCropId = cropId;
+
+    // Show the modal with pre-filled information
+    $('#addCropModal').modal('show');
+});
+
+
+// Delete Crop
+$(document).on('click', '.delete-crop', function() {
+    const cropId = $(this).closest('.col-md-4').data('crop-id');
+
+    // Remove from cropList
+    cropList = cropList.filter(crop => crop.id !== cropId);
+
+    // Remove crop card from the page
+    $(this).closest('.col-md-4').remove();
 });
 
 function validateForm() {

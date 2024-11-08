@@ -7,9 +7,6 @@ export class CropModel {
         this.season = cropSeason;
         this.image = cropImage;
 
-
-
-
     }
 
     get cropCode() {
