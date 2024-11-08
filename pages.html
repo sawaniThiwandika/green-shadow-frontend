@@ -133,7 +133,7 @@
                             </div>
                             <div class="mb-3">
                                 <label for="cropImage" class="form-label">Crop Image URL</label>
-                                <input type="text" class="form-control" id="cropImage" placeholder="Enter image URL"
+                                <input type="file" class="form-control" id="cropImage" placeholder="Enter image URL"
                                        required>
                             </div>
                             <div class="mb-3">
@@ -159,6 +159,7 @@
         </div>
     </section>
 
+    <!--Field Section-->
     <section id="fieldsSection" style="display: none">
         <div class="container my-5">
             <h3 class="text-center" id="fieldsHeader">Field Management</h3>
@@ -228,11 +229,11 @@
                             </div>
                             <div class="mb-3">
                                 <label for="fieldImage1" class="form-label">Field Image 1 (URL)</label>
-                                <input type="text" class="form-control" id="fieldImage1" placeholder="Enter image URL" required>
+                                <input type="file" class="form-control" id="fieldImage1" placeholder="Enter image URL" required>
                             </div>
                             <div class="mb-3">
                                 <label for="fieldImage2" class="form-label">Field Image 2 (URL)</label>
-                                <input type="text" class="form-control" id="fieldImage2" placeholder="Enter second image URL" required>
+                                <input type="file" class="form-control" id="fieldImage2" placeholder="Enter second image URL" required>
                             </div>
                             <button type="submit" class="btn btn-success w-100" id="submitField">Add Field</button>
                         </form>
@@ -241,6 +242,8 @@
             </div>
         </div>
     </section>
+
+   <!-- staff Section-->
     <section id="staffSection" style="display: none;">
         <div class="container my-5">
             <h3 class="text-center" id="staffHeader">Staff Management</h3>
@@ -378,6 +381,7 @@
 <script type="module" src="controller/DashboardController.js"></script>
 <script type="module" src="controller/CropController.js"></script>
 <script type="module" src="controller/StaffController.js"></script>
+<script type="module" src="controller/FieldController.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

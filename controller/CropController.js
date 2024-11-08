@@ -3,44 +3,49 @@ import {cropList} from "../Db/db.js";
 $('#cropForm').on('submit', function(event) {
     event.preventDefault();
 
-
-    if (!validateForm()) {
-        return;
-    }
-
-
     const cropCode = $('#cropCode').val();
     const commonName = $('#commonName').val();
     const scientificName = $('#scientificName').val();
-    const cropImage = $('#cropImage').val();
     const category = $('#category').val();
     const season = $('#season').val();
     const fieldDetails = $('#fieldDetails').val();
-    cropList.push(new CropModel(cropCode,commonName,scientificName,category,season,cropImage));
 
+    const file = $('#cropImage')[0].files[0];
 
-    const cropContainer = $('#cropContainer');
-    const cropCard = `
-      <div class="col-md-4">
-        <div class="card">
-          <img src="${cropImage}" alt="${commonName}" class="card-img-top crop-img">
-          <div class="card-body">
-            <h5 class="card-title">${commonName}</h5>
-            <p><strong>Code:</strong> ${cropCode}</p>
-            <p><strong>Scientific Name:</strong> ${scientificName}</p>
-            <p><strong>Category:</strong> ${category}</p>
-            <p><strong>Season:</strong> ${season}</p>
-            <p><strong>Field Details:</strong> ${fieldDetails}</p>
-          </div>
-        </div>
-      </div>
-    `;
+    if (file) {
+        const reader = new FileReader();
 
-    cropContainer.append(cropCard);
-    $('#cropForm')[0].reset();
-    $('#addCropModal').modal('hide');
+        reader.onload = function(e) {
+            const cropImage = e.target.result;
+            cropList.push(new CropModel(cropCode, commonName, scientificName, category, season, cropImage));
+
+            const cropContainer = $('#cropContainer');
+            const cropCard = `
+                <div class="col-md-4">
+                    <div class="card">
+                        <img src="${cropImage}" alt="${commonName}" class="card-img-top crop-img">
+                        <div class="card-body">
+                            <h5 class="card-title">${commonName}</h5>
+                            <p><strong>Code:</strong> ${cropCode}</p>
+                            <p><strong>Scientific Name:</strong> ${scientificName}</p>
+                            <p><strong>Category:</strong> ${category}</p>
+                            <p><strong>Season:</strong> ${season}</p>
+                            <p><strong>Field Details:</strong> ${fieldDetails}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            cropContainer.append(cropCard);
+            $('#cropForm')[0].reset();
+            $('#addCropModal').modal('hide');
+        };
+
+        reader.readAsDataURL(file);
+    } else {
+        alert("Please upload an image.");
+    }
 });
-
 
 function validateForm() {
     let isValid = true;
