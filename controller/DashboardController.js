@@ -35,6 +35,7 @@ $('#navCrops').on('click', () => {
     $('#dashboardSection').css('display', 'none');
     $('#fieldsSection').css('display', 'none');
     $('#staffSection').css('display', 'none');
+    $('#vehicleSection').css('display', 'none');
     console.log("clicked");
 });
 $('#navDashboard').on('click', () => {
@@ -43,6 +44,7 @@ $('#navDashboard').on('click', () => {
     $('#cropsSection').css('display', 'none');
     $('#fieldsSection').css('display', 'none');
     $('#staffSection').css('display', 'none');
+    $('#vehicleSection').css('display', 'none');
     console.log("clicked");
 });
 $('#navFields').on('click', () => {
@@ -51,6 +53,7 @@ $('#navFields').on('click', () => {
     $('#dashboardSection').css('display', 'none');
     $('#cropsSection').css('display', 'none');
     $('#staffSection').css('display', 'none');
+    $('#vehicleSection').css('display', 'none');
     console.log("clicked");
 });
 $('#navStaff').on('click', () => {
@@ -59,10 +62,21 @@ $('#navStaff').on('click', () => {
     $('#logsSection').css('display', 'none');
     $('#dashboardSection').css('display', 'none');
     $('#cropsSection').css('display', 'none');
+    $('#vehicleSection').css('display', 'none');
     console.log("clicked");
 });
 $('#navLogs').on('click', () => {
     $('#logsSection').css('display', 'block');
+    $('#staffSection').css('display', 'none');
+    $('#fieldsSection').css('display', 'none');
+    $('#dashboardSection').css('display', 'none');
+    $('#cropsSection').css('display', 'none');
+    $('#vehicleSection').css('display', 'none');
+    console.log("clicked");
+});
+$('#navVehicle').on('click', () => {
+    $('#vehicleSection').css('display', 'block');
+    $('#logsSection').css('display', 'none');
     $('#staffSection').css('display', 'none');
     $('#fieldsSection').css('display', 'none');
     $('#dashboardSection').css('display', 'none');
