@@ -530,6 +530,89 @@
         </div>
     </section>
 
+    <!-- Equipment Section -->
+    <section id="equipmentSection" style="display: none">
+        <div class="container my-5">
+            <h3 class="text-center" id="equipmentHeader">Equipment Management</h3>
+
+            <div class="text-center my-3">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEquipmentModal"
+                        id="addNewEquipment">
+                    Add New Equipment
+                </button>
+            </div>
+
+            <!-- Equipment table container -->
+            <div class="table-responsive">
+                <table class="table table-bordered" id="equipmentTable">
+                    <thead>
+                    <tr>
+                        <th>Equipment ID</th>
+                        <th>Name</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Assigned Staff</th>
+                        <th>Assigned Field</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="equipmentContainer">
+                    <!-- Equipment rows will be appended here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Equipment Modal -->
+        <div class="modal fade" id="addEquipmentModal" tabindex="-1" aria-labelledby="addEquipmentModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addEquipmentModalLabel">Add New Equipment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="equipmentForm">
+                            <div class="mb-3">
+                                <label for="equipmentId" class="form-label">Equipment ID</label>
+                                <input type="text" class="form-control" id="equipmentId" placeholder="Enter unique equipment ID" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="equipmentName" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="equipmentName" placeholder="Enter equipment name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="equipmentType" class="form-label">Type</label>
+                                <select class="form-control" id="equipmentType" required>
+                                    <option value="" disabled selected>Select type</option>
+                                    <option value="Electrical">Electrical</option>
+                                    <option value="Mechanical">Mechanical</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="equipmentStatus" class="form-label">Status</label>
+                                <select class="form-control" id="equipmentStatus" required>
+                                    <option value="" disabled selected>Select status</option>
+                                    <option value="Available">Available</option>
+                                    <option value="Out of Service">Out of Service</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="equipmentAssignedStaff" class="form-label">Assigned Staff</label>
+                                <input type="text" class="form-control" id="equipmentAssignedStaff" placeholder="Enter assigned staff (or N/A)" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="equipmentAssignedField" class="form-label">Assigned Field</label>
+                                <input type="text" class="form-control" id="equipmentAssignedField" placeholder="Enter assigned field (or N/A)" required>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100" id="submitEquipment">Add Equipment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
 
 
@@ -545,6 +628,7 @@
 <script type="module" src="controller/FieldController.js"></script>
 <script type="module" src="controller/LogController.js"></script>
 <script type="module" src="controller/VehicleController.js"></script>
+<script type="module" src="controller/EquipmentController.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
