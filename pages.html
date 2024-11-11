@@ -613,6 +613,72 @@
         </div>
     </section>
 
+    <!-- User Section -->
+    <section id="userSection" style="display: none">
+        <div class="container my-5">
+            <h3 class="text-center" id="userHeader">User Management</h3>
+
+            <div class="text-center my-3">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal"
+                        id="addNewUser">
+                    Add New User
+                </button>
+            </div>
+
+            <!-- User table container -->
+            <div class="table-responsive">
+                <table class="table table-bordered" id="userTable">
+                    <thead>
+                    <tr>
+                        <th>Email (Username)</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="userContainer">
+                    <!-- User rows will be appended here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- User Modal -->
+        <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="userForm">
+                            <div class="mb-3">
+                                <label for="userEmail" class="form-label">Email (Username)</label>
+                                <input type="email" class="form-control" id="userEmail" placeholder="Enter email" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="userPassword" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="userPassword" placeholder="Enter password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="userRole" class="form-label">Role</label>
+                                <select class="form-control" id="userRole" required>
+                                    <option value="" disabled selected>Select role</option>
+                                    <option value="MANAGER">Manager</option>
+                                    <option value="ADMINISTRATIVE">Administrative</option>
+                                    <option value="SCIENTIST">Scientist</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100" id="submitUser">Add User</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
 
 
 
@@ -629,6 +695,7 @@
 <script type="module" src="controller/LogController.js"></script>
 <script type="module" src="controller/VehicleController.js"></script>
 <script type="module" src="controller/EquipmentController.js"></script>
+<script type="module" src="controller/UserController.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
