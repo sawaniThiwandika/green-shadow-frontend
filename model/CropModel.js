@@ -1,11 +1,14 @@
+
+
 export class CropModel {
-    constructor(cropCode, cropName, cropScientificName, cropCategory, cropSeason, cropImage) {
+    constructor(cropCode, cropName, cropScientificName, cropCategory, cropSeason, cropImage,fields) {
         this.code = cropCode;
         this.name = cropName;
         this.scientificName = cropScientificName;
         this.category = cropCategory;
         this.season = cropSeason;
         this.image = cropImage;
+        this.fields=fields;
 
     }
 
@@ -56,4 +59,12 @@ export class CropModel {
     get cropImage() {
         return this.image;
     }
+    set cropFields(value) {
+        this.fields = value;
+    }
+
+    get cropFields() {
+        return this.fields;
+    }
+
 }

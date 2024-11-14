@@ -1,5 +1,5 @@
 import {CropModel} from "../model/CropModel.js";
-import {cropList} from "../Db/db.js";
+import {cropList, equipmentList} from "../Db/db.js";
 let editCropId = null; // To keep track of the crop being edited
 
 // Form submit event handler
@@ -23,13 +23,13 @@ $('#cropForm').on('submit', function(event) {
             if (editCropId !== null) {
                 // Update existing crop
                 const crop = cropList.find(c => c.code === editCropId);
-                crop.cropCode = cropCode;
-                crop.cropName = commonName;
-                crop.cropScientificName = scientificName;
-                crop.cropCategory = category;
-                crop.cropSeason = season;
-                crop.fieldDetails = fieldDetails;
-                crop.cropImage = cropImage;
+                crop.code = cropCode;
+                crop.name = commonName;
+                crop.ScientificName = scientificName;
+                crop.category = category;
+                crop.season = season;
+                crop.fields = fieldDetails;
+                crop.image = cropImage;
 
                 // Update the crop card in the DOM
                 const cropCard = $(`[data-crop-id="${editCropId}"]`);
@@ -44,7 +44,7 @@ $('#cropForm').on('submit', function(event) {
                 editCropId = null;  // Reset edit mode
             } else {
                 // Add new crop
-                cropList.push(new CropModel(cropCode, commonName, scientificName, category, season, cropImage));
+                cropList.push(new CropModel(cropCode, commonName, scientificName, category, season, cropImage,fieldDetails));
 
                 const cropContainer = $('#cropContainer');
                 const cropCard = `
@@ -89,7 +89,7 @@ $(document).on('click', '.update-crop', function() {
     $('#scientificName').val(cropData.scientificName);
     $('#category').val(cropData.category);
     $('#season').val(cropData.season);
-    $('#fieldDetails').val(cropData.fieldDetails);
+    $('#fieldDetails').val(cropData.fields);
 
     // Set the edit mode with the crop ID
     editCropId = cropId;
@@ -104,7 +104,9 @@ $(document).on('click', '.delete-crop', function() {
     const cropId = $(this).closest('.col-md-4').data('crop-id');
 
     // Remove from cropList
-    cropList = cropList.filter(crop => crop.id !== cropId);
+    //cropList = cropList.filter(crop => crop.code !== cropId);
+    const index = cropList.findIndex(crop => crop.code === cropId);
+    if (index !== -1) cropList.splice(index, 1);
 
     // Remove crop card from the page
     $(this).closest('.col-md-4').remove();
