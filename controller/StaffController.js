@@ -1,6 +1,92 @@
 import {StaffModel} from "../model/StaffModel.js";
 import {staffList} from "../Db/db.js";
+getStaffList();
+function getStaffList(){
+    const http = new XMLHttpRequest();
+    staffList.length = 0;
 
+    http.onreadystatechange = () => {
+        if (http.readyState === 4) {
+            if (http.status === 200) {
+                let contentType = http.getResponseHeader("Content-Type");
+                console.log("Content type: " + contentType);
+
+                if (contentType && contentType.includes("application/json")) {
+                    try {
+                        let response = JSON.parse(http.responseText);
+                        console.log("Response:", response);
+
+                        response.forEach((staffData) => {
+                            const staffM = new StaffModel(
+                                staffData.id,
+                                staffData.firstName,
+                                staffData.lastName,
+                                staffData.designation,
+                                staffData.gender,
+                                staffData.joinedDate,
+                                staffData.dob,
+                                staffData.contactNo,
+                                staffData.email,
+                                staffData.addressLine1,
+                                staffData.addressLine2,
+                                staffData.addressLine3,
+                                staffData.addressLine4,
+                                staffData.addressLine5,
+                                staffData.role,
+                                staffData.fields,
+                                staffData.vehicle
+                            );
+                            staffList.push(staffM);
+                        });
+
+                        console.log(staffList);
+                       // loadId(); // Assuming this function loads some ID related data
+                        loadTable(); // Assuming this function populates a table with customer data
+
+                    } catch (e) {
+                        console.error("Failed to parse JSON response: ", e);
+                        console.error("Response text: ", http.responseText);
+                    }
+                } else {
+                    console.error("Unexpected content type: ", contentType);
+                    console.error("Response is not JSON: ", http.responseText);
+                }
+            } else {
+                console.error("Request failed with status: ", http.status);
+                console.error("Response text: ", http.responseText);
+            }
+        } else {
+            console.log("Processing stage: ", http.readyState);
+        }
+    };
+
+
+    // Use GET method to fetch customer list
+    http.open("GET", "http://localhost:5050/api/v1/staff", true);
+    http.send();
+}
+function loadTable() {
+    // Empty the table before loading new data
+    $('#staffContainer').empty();
+
+    // Loop through the staff data and append rows to the table
+    staffList.forEach(staff => {
+        $('#staffContainer').append(`
+            <tr data-staff-id="${staff.staffId}">
+                <td>${staff.staffId}</td>
+                <td>${staff.firstName} ${staff.lastName}</td>
+                <td>${staff.contactNo}</td>
+                <td>${staff.email}</td>
+                <td>
+                    <button class="btn btn-info btn-sm view-details" data-bs-toggle="modal" data-bs-target="#addStaffModal">Update</button>
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm delete-staff" data-bs-toggle="modal">Delete</button>
+                </td>
+            </tr>
+        `);
+    });
+}
 $('#staffForm').on('submit', function(event) {
     event.preventDefault();
 
@@ -48,6 +134,11 @@ $('#staffForm').on('submit', function(event) {
             existingStaff.role = role;
             existingStaff.fields = fields;
             existingStaff.vehicle = vehicle;
+
+
+
+
+
         }
     }
     // add new staff
@@ -128,6 +219,10 @@ $(document).on('click', '.delete-staff', function() {
         row.remove();
         if (staffList[staffId]) {
             delete staffList[staffId];
+
+
+
+
         }
 
         console.log("Staff member deleted with ID:", staffId);
