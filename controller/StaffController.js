@@ -40,7 +40,6 @@ function getStaffList(){
                         });
 
                         console.log(staffList);
-                       // loadId(); // Assuming this function loads some ID related data
                         loadTable(); // Assuming this function populates a table with customer data
 
                     } catch (e) {
@@ -116,7 +115,7 @@ $('#staffForm').on('submit', function(event) {
         existingRow.find('td').eq(2).text(contactNo);
         existingRow.find('td').eq(3).text(email);
 
-        let existingStaff = staffList.find(staff => staff.staffId === staffId);
+        let existingStaff = staffList.find(staff => staff.id === staffId);
         if (existingStaff) {
             existingStaff.firstName = firstName;
             existingStaff.lastName = lastName;
@@ -135,7 +134,30 @@ $('#staffForm').on('submit', function(event) {
             existingStaff.fields = fields;
             existingStaff.vehicle = vehicle;
 
+            const jsonData = JSON.stringify(new StaffModel(
+                staffId, firstName, lastName, designation, gender, joinedDate, dob,
+                contactNo, email, addressLine1, addressLine2, addressLine3,
+                addressLine4, addressLine5, role, fields, vehicle
+            ));
+// Create and configure XMLHttpRequest
+            const http = new XMLHttpRequest();
+            http.onreadystatechange = () => {
+                if (http.readyState === 4) {
+                    if (http.status === 201) {
+                        console.log("Staff saved successfully");
+                        console.log("Response Text: ", http.responseText);
+                    } else {
+                        console.error("Request failed with status: ", http.status);
+                    }
+                }
+            };
 
+            // Open a connection and set the Content-Type header
+            http.open("PUT", "http://localhost:5050/api/v1/staff", true);
+            http.setRequestHeader("Content-Type", "application/json");
+
+            // Send the JSON data
+            http.send(jsonData);
 
 
 
@@ -166,6 +188,33 @@ $('#staffForm').on('submit', function(event) {
         </tr>
         }
     `);
+
+        // Create JSON payload
+        const jsonData = JSON.stringify(new StaffModel(
+            staffId, firstName, lastName, designation, gender, joinedDate, dob,
+            contactNo, email, addressLine1, addressLine2, addressLine3,
+            addressLine4, addressLine5, role, fields, vehicle
+        ));
+
+        // Create and configure XMLHttpRequest
+        const http = new XMLHttpRequest();
+        http.onreadystatechange = () => {
+            if (http.readyState === 4) {
+                if (http.status === 201) {
+                    console.log("Staff saved successfully");
+                    console.log("Response Text: ", http.responseText);
+                } else {
+                    console.error("Request failed with status: ", http.status);
+                }
+            }
+        };
+
+        // Open a connection and set the Content-Type header
+        http.open("POST", "http://localhost:5050/api/v1/staff", true);
+        http.setRequestHeader("Content-Type", "application/json");
+
+        // Send the JSON data
+        http.send(jsonData);
     }
 
    //}
@@ -174,32 +223,7 @@ $('#staffForm').on('submit', function(event) {
     $('#staffForm')[0].reset();
     $('#addStaffModal').modal('hide');
 
-    // Create JSON payload
-    const jsonData = JSON.stringify(new StaffModel(
-        staffId, firstName, lastName, designation, gender, joinedDate, dob,
-        contactNo, email, addressLine1, addressLine2, addressLine3,
-        addressLine4, addressLine5, role, fields, vehicle
-    ));
 
-    // Create and configure XMLHttpRequest
-    const http = new XMLHttpRequest();
-    http.onreadystatechange = () => {
-        if (http.readyState === 4) {
-            if (http.status === 201) {
-                console.log("Staff saved successfully");
-                console.log("Response Text: ", http.responseText);
-            } else {
-                console.error("Request failed with status: ", http.status);
-            }
-        }
-    };
-
-    // Open a connection and set the Content-Type header
-    http.open("POST", "http://localhost:5050/api/v1/staff", true);
-    http.setRequestHeader("Content-Type", "application/json");
-
-    // Send the JSON data
-    http.send(jsonData);
 
 
 
