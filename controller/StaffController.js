@@ -58,6 +58,7 @@ $('#staffForm').on('submit', function(event) {
         staffList.push(new StaffModel(staffId, firstName, lastName, designation, gender, joinedDate, dob, contactNo, email, addressLine1, addressLine2, addressLine3,
             addressLine4, addressLine5, role, fields, vehicle));
 
+
         // Append to staff table
         $('#staffContainer').append(`
         <tr data-staff-id="${staffId}">
@@ -81,6 +82,36 @@ $('#staffForm').on('submit', function(event) {
 
     $('#staffForm')[0].reset();
     $('#addStaffModal').modal('hide');
+
+    // Create JSON payload
+    const jsonData = JSON.stringify(new StaffModel(
+        staffId, firstName, lastName, designation, gender, joinedDate, dob,
+        contactNo, email, addressLine1, addressLine2, addressLine3,
+        addressLine4, addressLine5, role, fields, vehicle
+    ));
+
+    // Create and configure XMLHttpRequest
+    const http = new XMLHttpRequest();
+    http.onreadystatechange = () => {
+        if (http.readyState === 4) {
+            if (http.status === 201) {
+                console.log("Staff saved successfully");
+                console.log("Response Text: ", http.responseText);
+            } else {
+                console.error("Request failed with status: ", http.status);
+            }
+        }
+    };
+
+    // Open a connection and set the Content-Type header
+    http.open("POST", "http://localhost:5050/api/v1/staff", true);
+    http.setRequestHeader("Content-Type", "application/json");
+
+    // Send the JSON data
+    http.send(jsonData);
+
+
+
 });
 $('#addNewStaff').on('click', function() {
     $('#addStaffModalLabel').text('Add Staff');
