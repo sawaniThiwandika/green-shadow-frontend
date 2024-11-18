@@ -2,11 +2,11 @@ export class VehicleModel {
 
     constructor(code, licensePlateNumber, category, fuelType, status, allocatedStaff, remarks) {
         this.vehicleCode = code;
-        this.vehiclelicensePlateNumber = licensePlateNumber;
+        this.vehicleLicensePlateNumber = licensePlateNumber;
         this.vehicleCategory = category;
         this.vehicleFuelType = fuelType;
         this.vehicleStatus = status;
-        this.vehicleAllocatedStaff = allocatedStaff;
+        this.staffId = allocatedStaff;
         this.vehicleRemarks = remarks;
     }
     set code(value) {
@@ -30,7 +30,7 @@ export class VehicleModel {
     }
 
     set allocatedStaff(value) {
-        this.vehicleAllocatedStaff = value;
+        this.staffId = value;
     }
 
     set remarks(value) {
@@ -41,7 +41,7 @@ export class VehicleModel {
     }
 
     get licensePlate() {
-        return this.vehiclelicensePlateNumber;
+        return this.vehicleLicensePlateNumber;
     }
 
     get category() {
@@ -57,7 +57,7 @@ export class VehicleModel {
     }
 
     get allocatedStaff() {
-        return this.vehicleAllocatedStaff;
+        return this.staffId;
     }
 
     get remarks() {

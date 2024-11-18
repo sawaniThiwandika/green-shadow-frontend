@@ -250,6 +250,36 @@ $(document).on('click', '.delete-staff', function() {
         }
 
         console.log("Staff member deleted with ID:", staffId);
+        const idJSON = JSON.stringify({ id: staffId });
+        const http = new XMLHttpRequest();
+        //const http=new XMLHttpRequest().setRequestHeader("Content-Type","application/json");
+        http.onreadystatechange = () => {
+            if (http.readyState === 4) {
+                if (http.status === 200) {
+                    let contentType = http.getResponseHeader("Content-Type");
+                    console.log("content type "+http);
+                    if (contentType && contentType.includes("application/json")) {
+                        try {
+                            let response = JSON.parse(http.responseText);
+                            console.log(response);
+                        } catch (e) {
+                            console.error("Failed to parse JSON response: ", http.responseText);
+                        }
+                    } else {
+                        console.error("Unexpected content type: ", contentType);
+                        console.error("Response is not JSON: ", http.responseText);
+                    }
+                } else {
+                    console.error("Failed with status: ", http.status);
+                    console.error("Processing stage: ", http.readyState);
+                }
+            } else {
+                console.log("Processing stage: ", http.readyState);
+            }
+        };
+        http.open("DELETE", `http://localhost:5050/api/v1/staff/${staffId}`, true);
+        http.setRequestHeader("Content-Type", "application/json");
+        http.send(idJSON);
     }
 });
 // View full details
