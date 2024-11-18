@@ -119,6 +119,37 @@ $(document).ready(function () {
             row.find('td:eq(3)').text(status);
             row.find('td:eq(4)').text(allocatedStaff);
 
+
+            const formData = new FormData();
+            formData.append("vehicleCode", vehicleCode);
+            formData.append("vehicleLicensePlateNumber", licensePlate);
+            formData.append("vehicleCategory", vehicleCategory);
+            formData.append("vehicleFuelType", fuelType);
+            formData.append("vehicleStatus", status);
+            formData.append("staffId", allocatedStaff);
+            formData.append("vehicleRemarks", remarks);
+            // Create and configure XMLHttpRequest
+            const http = new XMLHttpRequest();
+            http.onreadystatechange = () => {
+                if (http.readyState === 4) {
+                    if (http.status === 201) {
+                        console.log("Vehicle updated successfully");
+                        console.log("Response Text: ", http.responseText);
+                    } else {
+                        console.error("Request failed with status: ", http.status);
+                    }
+                }
+            };
+
+            // Open a connection and set the Content-Type header
+            http.open("PUT", "http://localhost:5050/api/v1/vehicle", true);
+            // http.setRequestHeader("Content-Type", "multipart/form-data");
+
+            // Send the Form data
+            http.send(formData);
+
+
+
         } else {
             // Add new vehicle to the list
             const newVehicle = new VehicleModel(vehicleCode, licensePlate, vehicleCategory, fuelType, status, allocatedStaff, remarks);
