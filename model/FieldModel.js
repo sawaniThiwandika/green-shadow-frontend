@@ -1,13 +1,15 @@
 export class FieldModel{
-    constructor(fieldCode, fieldName, fieldLocation, fieldSize, crops, staff, fieldImage1, fieldImage2) {
+    constructor(fieldCode, fieldName, fieldLocation, fieldSize , fieldImage1, fieldImage2,crops, staff,equipment,log) {
         this.fieldCode = fieldCode;
         this.fieldName = fieldName;
         this.fieldLocation = fieldLocation;
         this.fieldSize = fieldSize;
-        this.crops = crops || [];
-        this.staff = staff || [];
         this.fieldImage1 = fieldImage1;
         this.fieldImage2 = fieldImage2;
+        this.crops = crops || [];
+        this.staff = staff || [];
+        this.equipments = equipment || [];
+        this.logs = log || [];
     }
 
     getFieldCode() {
@@ -41,6 +43,14 @@ export class FieldModel{
     getFieldImage2() {
         return this.fieldImage2;
     }
+    getLogs() {
+        return this.logs;
+    }
+
+    getEquipments() {
+        return this.equipments;
+    }
+
 
     setFieldCode(value) {
         this.fieldCode = value;
@@ -72,6 +82,13 @@ export class FieldModel{
 
     setFieldImage2(value) {
         this.fieldImage2 = value;
+    }
+    setLog(value) {
+        this.logs = value;
+    }
+
+    setEquipment(value) {
+        this.logs = value;
     }
 
 }

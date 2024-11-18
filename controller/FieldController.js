@@ -1,7 +1,6 @@
-import {CropModel} from "../model/CropModel.js";
 import {FieldModel} from "../model/FieldModel.js";
-import {cropList} from "../Db/db.js";
 import {fieldList} from "../Db/db.js";
+//import {VehicleModel} from "../model/VehicleModel";
 
 $('#fieldForm').on('submit', function(event) {
     event.preventDefault();
@@ -33,11 +32,38 @@ $('#fieldForm').on('submit', function(event) {
             const existingFieldIndex = fieldList.findIndex(field => field.getFieldCode() === fieldCode);
 
             if (existingFieldIndex !== -1) {
-                fieldList[existingFieldIndex] = new FieldModel(fieldCode, fieldName, fieldLocation, fieldSize, crops, staff, fieldImage1, fieldImage2);
+                fieldList[existingFieldIndex] = new FieldModel(fieldCode, fieldName, fieldLocation, fieldSize,  fieldImage1, fieldImage2,crops, staff,[],[]);
             } else {
-                const newField = new FieldModel(fieldCode, fieldName, fieldLocation, fieldSize, crops, staff, fieldImage1, fieldImage2);
+                const newField = new FieldModel(fieldCode, fieldName, fieldLocation, fieldSize, fieldImage1, fieldImage2, crops, staff,[],[]);
                 fieldList.push(newField);
                 console.log(newField);
+           // send new field to the backend
+
+                const jsonData = JSON.stringify(new FieldModel(
+                    fieldCode, fieldName, fieldLocation, fieldSize, fieldImage1, fieldImage2, crops, staff,[],[]
+                ));
+// Create and configure XMLHttpRequest
+                const http = new XMLHttpRequest();
+                http.onreadystatechange = () => {
+                    if (http.readyState === 4) {
+                        if (http.status === 201) {
+                            console.log("Vehicle saved successfully");
+                            console.log("Response Text: ", http.responseText);
+                        } else {
+                            console.error("Request failed with status: ", http.status);
+                        }
+                    }
+                };
+
+                // Open a connection and set the Content-Type header
+                http.open("POST", "http://localhost:5050/api/v1/field", true);
+                http.setRequestHeader("Content-Type", "application/json");
+
+                // Send the JSON data
+                http.send(jsonData);
+
+
+
             }
 
             updateFieldTable();
