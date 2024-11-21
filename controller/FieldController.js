@@ -1,6 +1,52 @@
-import {FieldModel} from "../model/FieldModel.js";
+
 import {fieldList} from "../Db/db.js";
-//import {VehicleModel} from "../model/VehicleModel";
+
+function saveField(formData) {
+    $.ajax({
+        url: "http://localhost:5050/api/v1/field",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            console.log("Field saved successfully", response);
+
+            $('#fieldForm')[0].reset();
+            $('#addFieldModal').modal('hide');
+            $('#submitField').text('Add Field');
+
+        },
+        error: function(xhr, status, error) {
+            console.error("Error saving field: ", error);
+            console.error("Response text: ", xhr.responseText);
+        }
+    });
+}
+
+
+function updateField(fieldCode, formData) {
+    $.ajax({
+        url: `http://localhost:5050/api/v1/field/${fieldCode}`, // Update URL
+        type: "PUT",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            console.log("Field updated successfully", response);
+
+
+            $('#fieldForm')[0].reset();
+            $('#addFieldModal').modal('hide');
+            $('#submitField').text('Add Field'); // Reset button text
+
+        },
+        error: function(xhr, status, error) {
+            console.error("Error updating field: ", error);
+            console.error("Response text: ", xhr.responseText);
+        }
+    });
+}
+
 
 $('#fieldForm').on('submit', function(event) {
     event.preventDefault();
@@ -20,95 +66,32 @@ $('#fieldForm').on('submit', function(event) {
         return;
     }
 
-    const reader1 = new FileReader();
-    const reader2 = new FileReader();
+    // Prepare FormData
+    const formData = new FormData();
+    formData.append('fieldCode', fieldCode);
+    formData.append('fieldName', fieldName);
+    formData.append('fieldLocation', fieldLocation);
+    formData.append('fieldSize', fieldSize);
+    formData.append('fieldImage1', file1);
+    formData.append('fieldImage2', file2);
+    // formData.append('crops', JSON.stringify(crops));
+    // formData.append('staff', JSON.stringify(staff));
 
-    reader1.onload = function(e1) {
-        const fieldImage1 = e1.target.result;
+    // Check if fieldCode already exists
+    const existingFieldIndex = fieldList.findIndex(field => field.getFieldCode() === fieldCode);
 
-        reader2.onload = function(e2) {
-            const fieldImage2 = e2.target.result;
-
-            const existingFieldIndex = fieldList.findIndex(field => field.getFieldCode() === fieldCode);
-
-            if (existingFieldIndex !== -1) {
-                fieldList[existingFieldIndex] = new FieldModel(fieldCode, fieldName, fieldLocation, fieldSize,  fieldImage1, fieldImage2,crops, staff,[],[]);
-            } else {
-                const newField = new FieldModel(fieldCode, fieldName, fieldLocation, fieldSize, fieldImage1, fieldImage2, crops, staff,[],[]);
-                fieldList.push(newField);
-                console.log(newField);
-           // send new field to the backend
-
-                const jsonData = JSON.stringify(new FieldModel(
-                    fieldCode, fieldName, fieldLocation, fieldSize, fieldImage1, fieldImage2, crops, staff,[],[]
-                ));
-// Create and configure XMLHttpRequest
-                const http = new XMLHttpRequest();
-                http.onreadystatechange = () => {
-                    if (http.readyState === 4) {
-                        if (http.status === 201) {
-                            console.log("Vehicle saved successfully");
-                            console.log("Response Text: ", http.responseText);
-                        } else {
-                            console.error("Request failed with status: ", http.status);
-                        }
-                    }
-                };
-
-                // Open a connection and set the Content-Type header
-                http.open("POST", "http://localhost:5050/api/v1/field", true);
-                http.setRequestHeader("Content-Type", "application/json");
-
-                // Send the JSON data
-                http.send(jsonData);
-
-
-
-            }
-
-            updateFieldTable();
-
-            // Reset the form
-            $('#fieldForm')[0].reset();
-            $('#addFieldModal').modal('hide');
-            $('#submitField').text('Add Field'); // Reset button text
-        };
-
-        reader2.readAsDataURL(file2);
-    };
-
-    reader1.readAsDataURL(file1);
+    if (existingFieldIndex !== -1) {
+        updateField(fieldCode, formData); // Call updateField for existing field
+    } else {
+        saveField(formData); // Call saveField for new field
+    }
 });
 
-// Function to update the field table dynamically
-function updateFieldTable() {
-    const fieldContainer = $('#fieldContainer');
-    fieldContainer.empty(); // Clear existing table rows
 
-    fieldList.forEach(field => {
-        const row = `
-            <tr data-field-code="${field.getFieldCode()}">
-                <td>${field.getFieldCode()}</td>
-                <td>${field.getFieldName()}</td>
-                <td>${field.getFieldLocation()}</td>
-                <td>${field.getFieldSize()} sq.m</td>
-                <td>${field.getCrops().join(', ')}</td>
-                <td>${field.getStaff().join(', ')}</td>
-                <td><img src="${field.getFieldImage1()}" alt="Field Image 1" class="img-thumbnail" width="100"></td>
-                <td><img src="${field.getFieldImage2()}" alt="Field Image 2" class="img-thumbnail" width="100"></td>
-                <td>
-                    <button class="btn btn-primary btn-sm update-field">Update</button>
-                    <button class="btn btn-danger btn-sm delete-field">Delete</button>
-                </td>
-            </tr>
-        `;
-        fieldContainer.append(row);
-    });
-}
 
-//Update
+// Update Field Handler for Cards
 $(document).on('click', '.update-field', function() {
-    const fieldCode = $(this).closest('tr').data('field-code');
+    const fieldCode = $(this).closest('.col-md-4').data('field-code');
     const field = fieldList.find(f => f.getFieldCode() === fieldCode);
 
     if (field) {
@@ -124,13 +107,102 @@ $(document).on('click', '.update-field', function() {
     }
 });
 
-//Delete
+// Delete Field Handler for Cards
 $(document).on('click', '.delete-field', function() {
-    const fieldCode = $(this).closest('tr').data('field-code');
+    const fieldCode = $(this).closest('.col-md-4').data('field-code');
     const fieldIndex = fieldList.findIndex(f => f.getFieldCode() === fieldCode);
 
     if (fieldIndex !== -1) {
         fieldList.splice(fieldIndex, 1);
-        updateFieldTable();
+
     }
 });
+
+export class GetAllField {
+    constructor(containerId) {
+        this.containerId = containerId;
+        this.fieldList = []; // Initialize an empty field list
+    }
+
+    async loadFields() {
+        try {
+            const response = await fetch("http://localhost:5050/api/v1/field", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch fields: ${response.statusText}`);
+            }
+
+            const fields = await response.json();
+            console.log("Fields fetched:", fields);
+
+            this.fieldList = fields;
+
+            this.renderFieldCards();
+        } catch (error) {
+            console.error("Error loading fields:", error);
+        }
+    }
+
+    renderFieldCards() {
+        const container = document.getElementById(this.containerId);
+        container.innerHTML = ''; // Clear existing cards
+
+        this.fieldList.forEach(field => {
+            const card = document.createElement('div');
+            card.className = 'col-lg-4 col-md-6 col-sm-12 mb-4'; // Grid layout for responsiveness
+
+            let image1Data = `data:image/jpeg;base64,${field.fieldImage1}`;
+            let image2Data = `data:image/jpeg;base64,${field.fieldImage2}`;
+
+            card.innerHTML = `
+            <div class="card">
+                <!-- Bootstrap Carousel for Image Slide -->
+                <div id="carouselFieldImages${field.fieldCode}" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img src="${image1Data}" class="d-block w-100" alt="Field Image 1">
+                        </div>
+                        <div class="carousel-item">
+                            <img src="${image2Data}" class="d-block w-100" alt="Field Image 2">
+                        </div>
+                    </div>
+                    <!-- Carousel Controls -->
+                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselFieldImages${field.fieldCode}" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#carouselFieldImages${field.fieldCode}" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">${field.fieldName}</h5>
+                    <p class="card-text"><strong>Code:</strong> ${field.fieldCode}</p>
+                    <p class="card-text"><strong>Location:</strong> ${field.fieldLocation}</p>
+                    <p class="card-text"><strong>Size:</strong> ${field.fieldSize} Sq. m</p>
+                    <p class="card-text"><strong>Crops:</strong> ${field.crops?.join(', ') || 'N/A'}</p>
+                    <p class="card-text"><strong>Staff:</strong> ${field.staff?.join(', ') || 'N/A'}</p>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFieldModal" onclick="populateFieldForm('${field.fieldCode}')">Edit</button>
+                </div>
+            </div>
+        `;
+
+            container.appendChild(card);
+        });
+    }
+
+}
+
+// Usage example
+document.addEventListener("DOMContentLoaded", () => {
+    const fieldManager = new GetAllField('fieldContainer'); // Pass the container ID
+    fieldManager.loadFields(); // Load and display fields
+});
+
+

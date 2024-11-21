@@ -158,8 +158,7 @@
             </div>
         </div>
     </section>
-
-    <!--Field Section-->
+<!--field section-->
     <section id="fieldsSection" style="display: none">
         <div class="container my-5">
             <h3 class="text-center" id="fieldsHeader">Field Management</h3>
@@ -171,25 +170,9 @@
                 </button>
             </div>
 
-            <!-- Field Table -->
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped" id="fieldTable">
-                    <thead class="table-light">
-                    <tr>
-                        <th>Field Code</th>
-                        <th>Field Name</th>
-                        <th>Location (GPS)</th>
-                        <th>Extent (Sq. m)</th>
-                        <th>Available Crops</th>
-                        <th>Allocated Staff</th>
-                        <th>Field Image 1</th>
-                        <th>Field Image 2</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody id="fieldContainer">
-                    </tbody>
-                </table>
+            <!-- Field Cards -->
+            <div class="row" id="fieldContainer">
+                <!-- Each field card will be dynamically generated here -->
             </div>
         </div>
 
@@ -229,11 +212,11 @@
                             </div>
                             <div class="mb-3">
                                 <label for="fieldImage1" class="form-label">Field Image 1 (URL)</label>
-                                <input type="file" class="form-control" id="fieldImage1" placeholder="Enter image URL" required>
+                                <input type="file" class="form-control" id="fieldImage1" required>
                             </div>
                             <div class="mb-3">
                                 <label for="fieldImage2" class="form-label">Field Image 2 (URL)</label>
-                                <input type="file" class="form-control" id="fieldImage2" placeholder="Enter second image URL" required>
+                                <input type="file" class="form-control" id="fieldImage2" required>
                             </div>
                             <button type="submit" class="btn btn-success w-100" id="submitField">Add Field</button>
                         </form>
@@ -243,7 +226,7 @@
         </div>
     </section>
 
-   <!-- staff Section-->
+    <!-- staff Section-->
     <section id="staffSection" style="display: none;">
         <div class="container my-5">
             <h3 class="text-center" id="staffHeader">Staff Management</h3>
