@@ -1,53 +1,14 @@
-
 import {fieldList} from "../Db/db.js";
-
-function saveField(formData) {
-    $.ajax({
-        url: "http://localhost:5050/api/v1/field",
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            console.log("Field saved successfully", response);
-
-            $('#fieldForm')[0].reset();
-            $('#addFieldModal').modal('hide');
-            $('#submitField').text('Add Field');
-
-        },
-        error: function(xhr, status, error) {
-            console.error("Error saving field: ", error);
-            console.error("Response text: ", xhr.responseText);
-        }
-    });
-}
-
-
-function updateField(fieldCode, formData) {
-    $.ajax({
-        url: `http://localhost:5050/api/v1/field/${fieldCode}`, // Update URL
-        type: "PUT",
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            console.log("Field updated successfully", response);
-
-
-            $('#fieldForm')[0].reset();
-            $('#addFieldModal').modal('hide');
-            $('#submitField').text('Add Field'); // Reset button text
-
-        },
-        error: function(xhr, status, error) {
-            console.error("Error updating field: ", error);
-            console.error("Response text: ", xhr.responseText);
-        }
-    });
-}
-
-
+document.addEventListener("DOMContentLoaded", () => {
+    const fieldManager = new GetAllField('fieldContainer');
+    fieldManager.loadFields();
+});
+document.getElementById('fieldContainer').addEventListener('click', (event) => {
+    if (event.target.classList.contains('update-field')) {
+        const fieldCode = event.target.dataset.fieldCode;
+        populateFieldForm(fieldCode);
+    }
+});
 $('#fieldForm').on('submit', function(event) {
     event.preventDefault();
 
@@ -78,52 +39,94 @@ $('#fieldForm').on('submit', function(event) {
     // formData.append('staff', JSON.stringify(staff));
 
     // Check if fieldCode already exists
-    const existingFieldIndex = fieldList.findIndex(field => field.getFieldCode() === fieldCode);
+    const existingFieldIndex = fieldList.findIndex(field => field.fieldCode === fieldCode);
 
     if (existingFieldIndex !== -1) {
-        updateField(fieldCode, formData); // Call updateField for existing field
+        updateField(formData); // Call updateField for existing field
     } else {
         saveField(formData); // Call saveField for new field
     }
 });
+// AJAX for save
+function saveField(formData) {
+    $.ajax({
+        url: "http://localhost:5050/api/v1/field",
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            console.log("Field saved successfully", response);
+
+            $('#fieldForm')[0].reset();
+            $('#addFieldModal').modal('hide');
+            $('#submitField').text('Add Field');
+
+        },
+        error: function(xhr, status, error) {
+            console.error("Error saving field: ", error);
+            console.error("Response text: ", xhr.responseText);
+        }
+    });
+}
+
+// AJAX for update
+function updateField(formData) {
+    $.ajax({
+        url: `http://localhost:5050/api/v1/field`,
+        type: "PUT",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+            console.log("Field updated successfully", response);
 
 
+            $('#fieldForm')[0].reset();
+            $('#addFieldModal').modal('hide');
+            $('#submitField').text('Add Field');
 
-// Update Field Handler for Cards
-$(document).on('click', '.update-field', function() {
-    const fieldCode = $(this).closest('.col-md-4').data('field-code');
-    const field = fieldList.find(f => f.getFieldCode() === fieldCode);
+        },
+        error: function(xhr, status, error) {
+            console.error("Error updating field: ", error);
+            console.error("Response text: ", xhr.responseText);
+        }
+    });
+}
 
-    if (field) {
-        $('#fieldCode').val(field.getFieldCode());
-        $('#fieldName').val(field.getFieldName());
-        $('#location').val(field.getFieldLocation());
-        $('#extent').val(field.getFieldSize());
-        $('#crops').val(field.getCrops().join(', '));
-        $('#staff').val(field.getStaff().join(', '));
+//AJAX for delete
 
-        $('#addFieldModal').modal('show');
-        $('#submitField').text('Update Field');
+function deleteField(fieldCode){
+
+}
+
+function populateFieldForm(fieldCode){
+    console.log("fieldCode"+fieldCode);
+    console.log(fieldList);
+
+    const field = fieldList.find(f => f.fieldCode === fieldCode);
+
+    console.log("Field    "+field);
+
+    if (field != null) {
+        document.getElementById("fieldCode").value = field.fieldCode;
+        document.getElementById("fieldName").value = field.fieldName;
+        document.getElementById("location").value = field.fieldLocation;
+        document.getElementById("extent").value = field.fieldSize;
+       // document.getElementById("crops").value = field.crops?.join(', ') || '';
+       // document.getElementById("staff").value = field.staff?.join(', ') || '';
+       // document.getElementById("fieldImage1").value = field.fieldImage1;
+        //document.getElementById("fieldImage2").value = field.fieldImage2;
     }
-});
+}
 
-// Delete Field Handler for Cards
-$(document).on('click', '.delete-field', function() {
-    const fieldCode = $(this).closest('.col-md-4').data('field-code');
-    const fieldIndex = fieldList.findIndex(f => f.getFieldCode() === fieldCode);
-
-    if (fieldIndex !== -1) {
-        fieldList.splice(fieldIndex, 1);
-
-    }
-});
 
 export class GetAllField {
     constructor(containerId) {
         this.containerId = containerId;
-        this.fieldList = []; // Initialize an empty field list
     }
 
+    //Ajax for get all
     async loadFields() {
         try {
             const response = await fetch("http://localhost:5050/api/v1/field", {
@@ -140,7 +143,8 @@ export class GetAllField {
             const fields = await response.json();
             console.log("Fields fetched:", fields);
 
-            this.fieldList = fields;
+            fieldList.length = 0;
+            fieldList.push(...fields);
 
             this.renderFieldCards();
         } catch (error) {
@@ -148,13 +152,15 @@ export class GetAllField {
         }
     }
 
+
     renderFieldCards() {
         const container = document.getElementById(this.containerId);
-        container.innerHTML = ''; // Clear existing cards
+        container.innerHTML = '';
 
-        this.fieldList.forEach(field => {
+        fieldList.forEach(field => {
             const card = document.createElement('div');
             card.className = 'col-lg-4 col-md-6 col-sm-12 mb-4'; // Grid layout for responsiveness
+            console.log(field.fieldCode);
 
             let image1Data = `data:image/jpeg;base64,${field.fieldImage1}`;
             let image2Data = `data:image/jpeg;base64,${field.fieldImage2}`;
@@ -188,7 +194,8 @@ export class GetAllField {
                     <p class="card-text"><strong>Size:</strong> ${field.fieldSize} Sq. m</p>
                     <p class="card-text"><strong>Crops:</strong> ${field.crops?.join(', ') || 'N/A'}</p>
                     <p class="card-text"><strong>Staff:</strong> ${field.staff?.join(', ') || 'N/A'}</p>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addFieldModal" onclick="populateFieldForm('${field.fieldCode}')">Edit</button>
+                   <button class="btn btn-warning btn-sm update-field" data-bs-toggle="modal" data-bs-target="#addFieldModal" data-field-code="${field.fieldCode}">Edit</button>
+                    <button class="btn btn-danger btn-sm delete-vehicle">Delete</button>
                 </div>
             </div>
         `;
@@ -199,10 +206,6 @@ export class GetAllField {
 
 }
 
-// Usage example
-document.addEventListener("DOMContentLoaded", () => {
-    const fieldManager = new GetAllField('fieldContainer'); // Pass the container ID
-    fieldManager.loadFields(); // Load and display fields
-});
+
 
 
