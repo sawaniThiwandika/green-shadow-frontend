@@ -1,4 +1,6 @@
 import {fieldList} from "../Db/db.js";
+
+
 document.addEventListener("DOMContentLoaded", () => {
     const fieldManager = new GetAllField('fieldContainer');
     fieldManager.loadFields();
@@ -7,6 +9,10 @@ document.getElementById('fieldContainer').addEventListener('click', (event) => {
     if (event.target.classList.contains('update-field')) {
         const fieldCode = event.target.dataset.fieldCode;
         populateFieldForm(fieldCode);
+    }
+    if (event.target.classList.contains('delete-field')) {
+        const fieldCode = event.target.dataset.fieldCode;
+        deleteField(fieldCode);
     }
 });
 $('#fieldForm').on('submit', function(event) {
@@ -72,6 +78,7 @@ function saveField(formData) {
 
 // AJAX for update
 function updateField(formData) {
+    const fieldManager = new GetAllField('fieldContainer');
     $.ajax({
         url: `http://localhost:5050/api/v1/field`,
         type: "PUT",
@@ -80,6 +87,7 @@ function updateField(formData) {
         contentType: false,
         success: function(response) {
             console.log("Field updated successfully", response);
+            fieldManager.loadFields();
 
 
             $('#fieldForm')[0].reset();
@@ -96,8 +104,37 @@ function updateField(formData) {
 
 //AJAX for delete
 
-function deleteField(fieldCode){
+async function deleteField(fieldCode){
 
+    console.log("Delete field code:"+fieldCode);
+    const fieldManager = new GetAllField('fieldContainer');
+    const confirmDelete = confirm("Are you sure you want to delete this field?");
+    if (!confirmDelete) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:5050/api/v1/field/${fieldCode}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to delete field: ${response.statusText}`);
+        }
+        console.log(`Field with code ${fieldCode} deleted successfully.`);
+
+        fieldList = fieldList.filter(field => field.fieldCode !== fieldCode);
+
+        await fieldManager.loadFields();
+
+        alert("Field deleted successfully!");
+    } catch (error) {
+        console.error("Error deleting field:", error);
+        alert("Failed to delete the field. Please try again later.");
+    }
 }
 
 function populateFieldForm(fieldCode){
@@ -194,8 +231,8 @@ export class GetAllField {
                     <p class="card-text"><strong>Size:</strong> ${field.fieldSize} Sq. m</p>
                     <p class="card-text"><strong>Crops:</strong> ${field.crops?.join(', ') || 'N/A'}</p>
                     <p class="card-text"><strong>Staff:</strong> ${field.staff?.join(', ') || 'N/A'}</p>
-                   <button class="btn btn-warning btn-sm update-field" data-bs-toggle="modal" data-bs-target="#addFieldModal" data-field-code="${field.fieldCode}">Edit</button>
-                    <button class="btn btn-danger btn-sm delete-vehicle">Delete</button>
+                    <button class="btn btn-warning btn-sm update-field" data-bs-toggle="modal" data-bs-target="#addFieldModal" data-field-code="${field.fieldCode}">Edit</button>
+                    <button class="btn btn-danger btn-sm delete-field" data-field-code="${field.fieldCode}">Delet</button>
                 </div>
             </div>
         `;
