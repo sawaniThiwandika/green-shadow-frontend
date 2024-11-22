@@ -1,6 +1,22 @@
 import {CropModel} from "../model/CropModel.js";
-import {cropList, equipmentList} from "../Db/db.js";
-let editCropId = null; // To keep track of the crop being edited
+import {cropList, equipmentList,fieldList} from "../Db/db.js";
+let editCropId = null;
+$(document).ready(function () {
+
+    $("#fieldDetailsCrop").on("input", function () {
+        populateDatalistFields();
+        console.log("Clicked on search  Field");
+
+    });
+});
+function populateDatalistFields() {
+    var datalistForFields = $("#fieldListForCrop");
+    datalistForFields.empty();
+    $.each(fieldList, function(index, field) {
+        datalistForFields.append($("<option>", { value: field.fieldName}));
+    });
+}
+
 
 // Form submit event handler
 $('#cropForm').on('submit', function(event) {

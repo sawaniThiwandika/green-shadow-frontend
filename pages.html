@@ -147,10 +147,11 @@
                                        placeholder="Enter season of the crop" required>
                             </div>
                             <div class="mb-3">
-                                <label for="fieldDetails" class="form-label">Field Details</label>
-                                <textarea class="form-control" id="fieldDetails" rows="2"
-                                          placeholder="Enter field details" required></textarea>
+                                <label for="fieldDetailsCrop" class="form-label">Field Details</label>
+                                <input type="search" class="form-control" id="fieldDetailsCrop" rows="2"
+                                          placeholder="Enter field details" required list="fieldListForCrop">
                             </div>
+                            <datalist id="fieldListForCrop"></datalist>
                             <button type="submit" class="btn btn-success w-100" id="submitCrop">Add Crop</button>
                         </form>
                     </div>
