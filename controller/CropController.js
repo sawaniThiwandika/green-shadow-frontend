@@ -1,6 +1,7 @@
 import {CropModel} from "../model/CropModel.js";
 import {cropList, equipmentList,fieldList} from "../Db/db.js";
 let editCropId = null;
+let selectedFields=[]
 $(document).ready(function () {
 
     $("#fieldDetailsCrop").on("input", function () {
@@ -8,7 +9,28 @@ $(document).ready(function () {
         console.log("Clicked on search  Field");
 
     });
+    $("#fieldDetailsCrop").on("keydown", function (event) {
+        if (event.key === "Enter") {
+            const selectedValue = $(this).val();
+            let field=isValidField(selectedValue);
+            if ( field!= null) {
+                if (!selectedFields.includes(field)) {
+                    selectedFields.push(field);
+                    console.log("Selected fields:", selectedFields);
+                } else {
+                    console.log("Field already selected:", selectedValue);
+                }
+            } else {
+                console.error("Invalid field selected:", selectedValue);
+            }
+            $(this).val("");
+        }
+    });
 });
+function isValidField(fieldName) {
+    const field = fieldList.find(field => field.fieldName === fieldName);
+    return field || null;
+}
 function populateDatalistFields() {
     var datalistForFields = $("#fieldListForCrop");
     datalistForFields.empty();
