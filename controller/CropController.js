@@ -2,6 +2,8 @@ import {cropList,fieldList} from "../Db/db.js";
 let selectedFieldListOfCrop = [];
 let editCropId = null;
 $(document).ready(function () {
+    const fieldManager = new GetAllCrop('cropContainer');
+    fieldManager.loadCrop();
 
     $("#fieldDetailsCrop").on("input", function () {
         populateDatalistFields();
@@ -134,186 +136,103 @@ $(document).ready(function () {
             }
         });
     }
-
-});
-
-
-/*
-$('#cropForm').on('submit', function(event) {
-
-
-    event.preventDefault();
-    console.log("Selected feld when submit btn clicked :"+selectedFieldListOfCrop);
-    const cropCode = $('#cropCode').val();
-    const commonName = $('#commonName').val();
-    const scientificName = $('#scientificName').val();
-    const category = $('#category').val();
-    const season = $('#season').val();
-    //const fieldDetails = $('#fieldDetails').val();
-    const file = $('#cropImage')[0].files[0];
-    if (!file) {
-        alert("Please upload  image");
-        return;
-    }
-    const formData = new FormData();
-    //formData.append('cropCode', cropCode);
-    formData.append('commonName', commonName);
-    formData.append('scientificName', scientificName);
-    formData.append('category', category);
-    formData.append('season', season);
-    formData.append('fieldDetails',JSON.stringify(selectedFieldListOfCrop));
-    formData.append('file', file);
-
-    // Check if fieldCode already exists
-    const existingCropIndex =cropList.findIndex(crop => crop.code === cropCode);
-
-    if (existingCropIndex !== -1) {
-        updateCrop(formData); // Call updateField for existing field
-    } else {
-        saveCrop(formData); // Call saveField for new field
-    }
-
-    /!*
-        if (file) {
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                const cropImage = e.target.result;
-
-                if (editCropId !== null) {
-                    // Update existing crop
-                    const crop = cropList.find(c => c.code === editCropId);
-                    crop.code = cropCode;
-                    crop.name = commonName;
-                    crop.ScientificName = scientificName;
-                    crop.category = category;
-                    crop.season = season;
-                    crop.fields = fieldDetails;
-                    crop.image = cropImage;
-
-                    // Update the crop card in the DOM
-                    const cropCard = $(`[data-crop-id="${editCropId}"]`);
-                    cropCard.find('.card-img-top').attr('src', cropImage);
-                    cropCard.find('.card-title').text(commonName);
-                    cropCard.find('p:nth-child(3)').text(`Code: ${cropCode}`);
-                    cropCard.find('p:nth-child(4)').text(`Scientific Name: ${scientificName}`);
-                    cropCard.find('p:nth-child(5)').text(`Category: ${category}`);
-                    cropCard.find('p:nth-child(6)').text(`Season: ${season}`);
-                    cropCard.find('p:nth-child(7)').text(`Field Details: ${fieldDetails}`);
-
-                    editCropId = null;  // Reset edit mode
-                } else {
-                    // Add new crop
-                    cropList.push(new CropModel(cropCode, commonName, scientificName, category, season, cropImage,fieldDetails));
-
-                    const cropContainer = $('#cropContainer');
-                    const cropCard = `
-                        <div class="col-md-4" data-crop-id="${cropCode}">
-                            <div class="card">
-                                <img src="${cropImage}" alt="${commonName}" class="card-img-top crop-img">
-                                <div class="card-body">
-                                    <h5 class="card-title">${commonName}</h5>
-                                    <p><strong>Code:</strong> ${cropCode}</p>
-                                    <p><strong>Scientific Name:</strong> ${scientificName}</p>
-                                    <p><strong>Category:</strong> ${category}</p>
-                                    <p><strong>Season:</strong> ${season}</p>
-                                    <p><strong>Field Details:</strong> ${fieldDetails}</p>
-                                    <button class="btn btn-primary btn-sm update-crop">Update</button>
-                                    <button class="btn btn-danger btn-sm delete-crop">Delete</button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-
-                    cropContainer.append(cropCard);
-                }
-
-                // Reset the form and hide the modal
-                $('#cropForm')[0].reset();
-                $('#addCropModal').modal('hide');
-            };
-
-            reader.readAsDataURL(file);
-        } else {
-            alert("Please upload an image.");
-        }*!/
-});
-
-
-
-function saveCrop(formData) {
-
-    console.log("Field list "+selectedFieldListOfCrop[0]);
-    $.ajax({
-        url: `http://localhost:5050/api/v1/crop`,
-        type: "POST",
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            console.log("Crop saved successfully", response);
-
-            $('#cropForm')[0].reset();
-            $('#addCropModal').modal('hide');
-            $('#submitCrop').text('Add Field');
-
-        },
-        error: function(xhr, status, error) {
-            console.error("Error saving crop: ", error);
-            console.error("Response text: ", xhr.responseText);
+    document.getElementById('cropContainer').addEventListener('click', (event) => {
+        if (event.target.classList.contains('update-crop')) {
+            const cropCode = event.target.dataset.cropCode;
+            console.log("Crop code:",cropCode)
+            populateCropForm(cropCode);
+        }
+        if (event.target.classList.contains('delete-crop')) {
+            const cropCode = event.target.dataset.code;
+            deleteCrop(cropCode);
         }
     });
-}
+    function populateCropForm(cropCode){
+        console.log("cropCode"+cropCode);
+        console.log(cropList);
 
-// AJAX for update
-function updateCrop(formData) {
-    //const fieldManager = new GetAllField('fieldContainer');
-    $.ajax({
-        url: `http://localhost:5050/api/v1/crop`,
-        type: "PUT",
-        data: formData,
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            console.log("Crop updated successfully", response);
-            //fieldManager.loadFields();
+        const crop = cropList.find(c => c.code=== cropCode);
 
-
-            $('#cropForm')[0].reset();
-            $('#addCropModal').modal('hide');
-            $('#submitCrop').text('Add Crop');
-
-        },
-        error: function(xhr, status, error) {
-            console.error("Error updating crop: ", error);
-            console.error("Response text: ", xhr.responseText);
+        console.log("Crop   "+crop);
+        if (crop!= null) {
+            document.getElementById("cropCode").value = crop.code;
+            document.getElementById("commonName").value = crop.name;
+            document.getElementById("scientificName").value =crop.scientificName;
+            document.getElementById("category").value =crop.category;
+            document.getElementById("season").value = crop.season;
+            //document.getElementById("cropImage").value = crop.image;
+            document.getElementById("fieldDetailsCrop").value = crop.fields;
         }
-    });
-}
-*/
+    }
 
-
-// Update Crop - Button Click Event
-$(document).on('click', '.update-crop', function() {
-    const cropId = $(this).closest('.col-md-4').data('crop-id');
-    const cropData = cropList.find(crop => crop.code === cropId);
-
-    $('#cropCode').val(cropData.code);
-    $('#commonName').val(cropData.name);
-    $('#scientificName').val(cropData.scientificName);
-    $('#category').val(cropData.category);
-    $('#season').val(cropData.season);
-    $('#fieldDetails').val(cropData.fields);
-
-    // Set the edit mode with the crop ID
-    editCropId = cropId;
-
-    // Show the modal with pre-filled information
-    $('#addCropModal').modal('show');
 });
 
+export class GetAllCrop {
+    constructor(containerId) {
+        this.containerId = containerId;
+    }
+    async loadCrop() {
+        try {
+            const response = await fetch("http://localhost:5050/api/v1/crop", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
 
-// Delete Crop
+            if (!response.ok) {
+                throw new Error(`Failed to fetch crops: ${response.statusText}`);
+            }
+
+            const crops = await response.json();
+            console.log("Crops fetched:", crops);
+
+           cropList.length = 0;
+            cropList.push(...crops);
+
+            this.renderCropCards();
+        } catch (error) {
+            console.error("Error loading crops:", error);
+        }
+    }
+
+    renderCropCards() {
+
+        console.log("")
+        const container = document.getElementById(this.containerId);
+        container.innerHTML = '';
+
+        cropList.forEach(crop => {
+            const card = document.createElement('div');
+            card.className = 'col-lg-4 col-md-6 col-sm-12 mb-4';
+
+            const cropImageSrc = crop.image
+                ? `data:image/jpeg;base64,${crop.image}`
+                : 'default-image-path.jpg';
+
+            card.innerHTML = `
+            <div class="card h-100">
+                <img src="${cropImageSrc}" class="card-img-top" alt="${crop.name}">
+                <div class="card-body">
+                    <h5 class="card-title">${crop.name}</h5>
+                    <p class="card-text"><strong>Scientific Name:</strong> ${crop.scientificName}</p>
+                    <p class="card-text"><strong>Category:</strong> ${crop.category}</p>
+                    <p class="card-text"><strong>Season:</strong> ${crop.season}</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <button class="btn btn-warning btn-sm update-crop" data-bs-toggle="modal" 
+                        data-bs-target="#addCropModal" data-crop-code="${crop.code}">Edit</button>
+                    <button class="btn btn-danger btn-sm delete-crop" data-crop-code="${crop.code}"> Delete </button>
+                </div>
+            </div>
+        `;
+
+            container.appendChild(card);
+        });
+    }
+
+}
+
 $(document).on('click', '.delete-crop', function() {
     const cropId = $(this).closest('.col-md-4').data('crop-id');
 
