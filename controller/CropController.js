@@ -89,7 +89,7 @@ $(document).ready(function () {
         const existingCropIndex = cropList.findIndex(crop => crop.code === cropCode);
 
         if (existingCropIndex !== -1) {
-            updateCrop(formData); // Update existing crop
+            updateCrop(cropCode,formData); // Update existing crop
         } else {
             saveCrop(formData); // Save new crop
         }
@@ -117,9 +117,10 @@ $(document).ready(function () {
         });
     }
 
-    function updateCrop(formData) {
+    function updateCrop(cropCode,formData) {
+
         $.ajax({
-            url: `http://localhost:5050/api/v1/crop`,
+            url: `http://localhost:5050/api/v1/crop/${cropCode}`,
             type: "PUT",
             data: formData,
             processData: false,
@@ -138,16 +139,18 @@ $(document).ready(function () {
     }
     document.getElementById('cropContainer').addEventListener('click', (event) => {
         if (event.target.classList.contains('update-crop')) {
+            selectedFieldListOfCrop.length=0;
             const cropCode = event.target.dataset.cropCode;
             console.log("Crop code:",cropCode)
             populateCropForm(cropCode);
         }
         if (event.target.classList.contains('delete-crop')) {
             const cropCode = event.target.dataset.code;
-            deleteCrop(cropCode);
+           // deleteCrop(cropCode);
         }
     });
     function populateCropForm(cropCode){
+        selectedFieldListOfCrop.length=0;
         console.log("cropCode"+cropCode);
         console.log(cropList);
 
@@ -162,6 +165,9 @@ $(document).ready(function () {
             document.getElementById("season").value = crop.season;
             //document.getElementById("cropImage").value = crop.image;
             document.getElementById("fieldDetailsCrop").value = crop.fields;
+            if (crop.fields && typeof crop.fields === "object") {
+                selectedFieldListOfCrop.push(...Object.values(crop.fields));
+            }
         }
     }
 
