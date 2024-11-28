@@ -1,18 +1,34 @@
-import {CropModel} from "../model/CropModel.js";
-import {FieldModel} from "../model/FieldModel.js";
-import {cropList} from "../Db/db.js";
-import {fieldList} from "../Db/db.js";
-import { LogModel } from "../model/LogModel.js"; // Assuming you have a LogModel
-import { logList } from "../Db/db.js"; // Assuming logs are stored in a db-like object
+import { LogModel } from "../model/LogModel.js";
+import {fieldList, logList} from "../Db/db.js";
+$(document).ready(function () {
+
+    $("#fieldOfLog").on("input", function () {
+        function populateDatalistFieldInLog() {
+            var datalistForFields = $("#fieldListForLog");
+            datalistForFields.empty();
+            $.each(fieldList, function(index, field) {
+                datalistForFields.append($("<option>", { value: field.fieldName}));
+            });
+        }
+        populateDatalistFieldInLog();
+
+
+
+    });
+
+});
+
 // Add New Log Button
 $('#addNewLog').on('click', function() {
     $('#logModalLabel').text('Add New Log');
     $('#submitLog').text('Add Log');
-    $('#logForm')[0].reset();  // Reset the form
-    $('#logModal').modal('show');  // Show the modal
+    $('#logForm')[0].reset();
+    $('#logModal').modal('show');
 });
 
 // Handle log form submission (add or update)
+
+
 $('#logForm').on('submit', function(event) {
     event.preventDefault();
 
@@ -124,3 +140,5 @@ $(document).on('click', '.delete-log', function() {
         console.log("Log deleted with code:", logCode);
     }
 });
+
+

@@ -145,8 +145,8 @@ $(document).ready(function () {
             populateCropForm(cropCode);
         }
         if (event.target.classList.contains('delete-crop')) {
-            const cropCode = event.target.dataset.code;
-           // deleteCrop(cropCode);
+            const cropCode = event.target.dataset.cropCode;
+            deleteCrop(cropCode);
         }
     });
     function populateCropForm(cropCode){
@@ -169,6 +169,39 @@ $(document).ready(function () {
                 selectedFieldListOfCrop.push(...Object.values(crop.fields));
             }
         }
+    }
+    async function deleteCrop(cropCode){
+
+        console.log("Delete crop code:"+cropCode);
+        const fieldManager = new GetAllCrop('cropContainer');
+        const confirmDelete = confirm("Are you sure you want to delete this crop?");
+        if (!confirmDelete) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:5050/api/v1/crop/${cropCode}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to delete crop: ${response.statusText}`);
+            }
+            console.log(`Field with code ${cropCode} deleted successfully.`);
+
+            cropList = cropList.filter(crop => crop.cropCode!== cropCode);
+
+            await fieldManager.loadFields();
+
+            alert("Crop deleted successfully!");
+        } catch (error) {
+            console.error("Error deleting crop:", error);
+            alert("Failed to delete the crop. Please try again later.");
+        }
+
     }
 
 });
