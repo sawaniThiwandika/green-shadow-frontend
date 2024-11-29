@@ -1,8 +1,10 @@
 import { LogModel } from "../model/LogModel.js";
-import {cropList, fieldList, logList} from "../Db/db.js";
+import {cropList, fieldList, logList, staffList} from "../Db/db.js";
+let selectedFieldOfLog=[];
+let selectedCropOfLog=[];
+let selectedStaffOfLog=[];
 $(document).ready(function () {
-    let selectedFieldOfLog=[];
-    let selectedCropOfLog=[];
+
 
     $("#fieldOfLog").on("input", function () {
         function populateDatalistFieldInLog() {
@@ -78,6 +80,43 @@ $(document).ready(function () {
         return crop || null;
     }
 
+    // staff list
+
+    $("#staffOfLog").on("input", function () {
+        function populateDatalistStaffInLog() {
+            var datalistForStaff= $("#staffListForLog");
+            datalistForStaff.empty();
+            $.each(staffList, function(index, staff) {
+                datalistForStaff.append($("<option>", { value: staff.email}));
+            });
+        }
+        populateDatalistStaffInLog();
+
+
+
+    });
+    $("#staffOfLog").on("keydown", function (event) {
+        if (event.key === "Enter") {
+
+            const selectedValue = $(this).val();
+            let staff=isValidStaff(selectedValue);
+            if ( staff!= null) {
+                if (!selectedStaffOfLog.includes(staff.email)) {
+                    selectedStaffOfLog.push(staff.id);
+                    console.log("Selected staff:",selectedStaffOfLog);
+                } else {
+                    console.log("staff already selected:", selectedValue);
+                }
+            } else {
+                console.error("Invalid staff selected:", selectedValue);
+            }
+            $(this).val("");
+        }
+    });
+    function isValidStaff(staffEmail) {
+        const staff = staffList.find(staff => staff.email === staffEmail);
+        return staff || null;
+    }
 
 });
 
@@ -104,50 +143,21 @@ $('#logForm').on('submit', function(event) {
     const details = $('#details').val();
     const observedImage = $('#observedImage')[0].files[0];  // Optional
 
-    const existingRow = $(`#logsContainer tr[data-log-code="${logCode}"]`);
+    const formData = new FormData();
+    formData.append('logDate', logDate);
+    formData.append('activity', activity);
+    formData.append('staff', JSON.stringify(selectedSatffOfLog));
+    formData.append('season', season);
+    formData.append('fieldDetails', JSON.stringify(selectedFieldListOfCrop)); // Send the field codes as JSON
+    formData.append('file', file);
 
-    // Update existing log
-    if (existingRow.length > 0) {
-        existingRow.find('td').eq(1).text(logDate);
-        existingRow.find('td').eq(2).text(activity);
-        existingRow.find('td').eq(3).text(staff);
-        existingRow.find('td').eq(4).text(details);
+    const existingCropIndex = logList.findIndex(log => log.logCode === logCode);
 
-        // Find and update the log in the logList
-        let existingLog = logList.find(log => log.getLogCode() === logCode);
-        if (existingLog) {
-            existingLog.setLogDate(logDate);
-            existingLog.setLogDetails(details);
-            existingLog.setRelevantStaff(staff);
-            existingLog.setObservedImage(observedImage ? observedImage.name : existingLog.getObservedImage());
-            existingLog.setRelevantFields(fields);
-            existingLog.setRelevantCrops(crops);
-        }
+    if (existingCropIndex !== -1) {
+        updateCrop(cropCode,formData); // Update existing crop
+    } else {
+        saveCrop(formData); // Save new crop
     }
-    // Add new log
-    else {
-        //if (validateLog()) {
-            logList.push(new LogModel(logCode, logDate, details, observedImage, fields, crops, staff));
-
-            // Append to logs table
-            $('#logsContainer').append(`
-                <tr data-log-code="${logCode}">
-                    <td>${logCode}</td>
-                    <td>${logDate}</td>
-                    <td>${activity}</td>
-                    <td>${staff}</td>
-                    <td>${details}</td>
-                    <td>
-                        <button class="btn btn-info btn-sm view-details-log" data-bs-toggle="modal" data-bs-target="#logModal">Update</button>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger btn-sm delete-log">Delete</button>
-                    </td>
-                </tr>
-            `);
-        }
-    //}
-
     // Reset the form and close the modal
     $('#logForm')[0].reset();
     $('#logModal').modal('hide');
