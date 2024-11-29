@@ -1,6 +1,7 @@
 import { LogModel } from "../model/LogModel.js";
 import {fieldList, logList} from "../Db/db.js";
 $(document).ready(function () {
+    let selectedFieldOfLog=[];
 
     $("#fieldOfLog").on("input", function () {
         function populateDatalistFieldInLog() {
@@ -15,6 +16,29 @@ $(document).ready(function () {
 
 
     });
+    $("#fieldOfLog").on("keydown", function (event) {
+        if (event.key === "Enter") {
+
+            const selectedValue = $(this).val();
+            let field=isValidField(selectedValue);
+            if ( field!= null) {
+                if (!selectedFieldOfLog.includes(field.fieldCode)) {
+                    selectedFieldOfLog.push(field.fieldCode);
+                    console.log("Selected fields:", selectedFieldOfLog);
+                } else {
+                    console.log("Field already selected:", selectedValue);
+                }
+            } else {
+                console.error("Invalid field selected:", selectedValue);
+            }
+            $(this).val("");
+        }
+    });
+    function isValidField(fieldName) {
+        const field = fieldList.find(field => field.fieldName === fieldName);
+        return field || null;
+    }
+
 
 });
 
