@@ -1,7 +1,8 @@
 import { LogModel } from "../model/LogModel.js";
-import {fieldList, logList} from "../Db/db.js";
+import {cropList, fieldList, logList} from "../Db/db.js";
 $(document).ready(function () {
     let selectedFieldOfLog=[];
+    let selectedCropOfLog=[];
 
     $("#fieldOfLog").on("input", function () {
         function populateDatalistFieldInLog() {
@@ -37,6 +38,44 @@ $(document).ready(function () {
     function isValidField(fieldName) {
         const field = fieldList.find(field => field.fieldName === fieldName);
         return field || null;
+    }
+
+    // crop details
+
+    $("#cropOfLog").on("input", function () {
+        function populateDatalistCropInLog() {
+            var datalistForCrop = $("#cropListForLog");
+            datalistForCrop.empty();
+            $.each(cropList, function(index, crop) {
+                datalistForCrop.append($("<option>", { value: crop.name}));
+            });
+        }
+        populateDatalistCropInLog();
+
+
+
+    });
+    $("#cropOfLog").on("keydown", function (event) {
+        if (event.key === "Enter") {
+
+            const selectedValue = $(this).val();
+            let crop=isValidCrop(selectedValue);
+            if ( crop!= null) {
+                if (!selectedCropOfLog.includes(crop.code)) {
+                    selectedCropOfLog.push(crop.code);
+                    console.log("Selected crops:",selectedCropOfLog);
+                } else {
+                    console.log("Crop already selected:", selectedValue);
+                }
+            } else {
+                console.error("Invalid crop selected:", selectedValue);
+            }
+            $(this).val("");
+        }
+    });
+    function isValidCrop(cropName) {
+        const crop = cropList.find(crop => crop.name === cropName);
+        return crop || null;
     }
 
 
