@@ -1,5 +1,5 @@
-import { LogModel } from "../model/LogModel.js";
 import {cropList, fieldList, logList, staffList} from "../Db/db.js";
+
 let selectedFieldOfLog=[];
 let selectedCropOfLog=[];
 let selectedStaffOfLog=[];
@@ -137,34 +137,77 @@ $('#logForm').on('submit', function(event) {
     const logCode = $('#logId').val();
     const logDate = $('#logDate').val();
     const activity = $('#activity').val();
-    const staff = $('#staffOfLog').val();
-    const crops = $('#cropOfLog').val();
-    const fields = $('#fieldOfLog').val();
+    // const staff = $('#staffOfLog').val();
+    // const crops = $('#cropOfLog').val();
+    // const fields = $('#fieldOfLog').val();
     const details = $('#details').val();
     const observedImage = $('#observedImage')[0].files[0];  // Optional
 
     const formData = new FormData();
     formData.append('logDate', logDate);
     formData.append('activity', activity);
-    formData.append('staff', JSON.stringify(selectedSatffOfLog));
-    formData.append('season', season);
-    formData.append('fieldDetails', JSON.stringify(selectedFieldListOfCrop)); // Send the field codes as JSON
-    formData.append('file', file);
+    formData.append('staff', JSON.stringify(selectedStaffOfLog));
+    formData.append('crops', JSON.stringify(selectedCropOfLog));
+    formData.append('fields', JSON.stringify(selectedFieldOfLog)); // Send the field codes as JSON
+    formData.append('image', observedImage);
 
     const existingCropIndex = logList.findIndex(log => log.logCode === logCode);
 
     if (existingCropIndex !== -1) {
-        updateCrop(cropCode,formData); // Update existing crop
+        updateLog(logCode, formData); // Update existing crop
     } else {
-        saveCrop(formData); // Save new crop
+        saveLog(formData); // Save new crop
     }
     // Reset the form and close the modal
     $('#logForm')[0].reset();
     $('#logModal').modal('hide');
 });
 
+function saveLog(formData) {
+
+
+    $.ajax({
+        url: `http://localhost:5050/api/v1/log`,
+        type: "POST",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            console.log("log saved successfully", response);
+            $('#logForm')[0].reset(); // Reset form after saving
+            $('#logModal').modal('hide');
+            $('#submitLog').text('Add Log');
+        },
+        error: function (xhr, status, error) {
+            console.error("Error saving log:", error);
+            console.error("Response text:", xhr.responseText);
+        }
+    });
+}
+
+function updateLog(logCode, formData) {
+
+    $.ajax({
+        url: `http://localhost:5050/api/v1/log/${logCode}`,
+        type: "PUT",
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (response) {
+            console.log("Log updated successfully", response);
+            $('#logForm')[0].reset(); // Reset form after updating
+            $('#logModal').modal('hide');
+            $('#submitLog').text('Add Log');
+        },
+        error: function (xhr, status, error) {
+            console.error("Error updating Log:", error);
+            console.error("Response text:", xhr.responseText);
+        }
+    });
+}
+
 // View Full Details (Populate the modal for update)
-$(document).on('click', '.view-details-log', function() {
+$(document).on('click', '.view-details-log', function () {
     // Ensure the row is properly selected
     const row = $(this).closest('tr');
     if (row.length === 0) {
