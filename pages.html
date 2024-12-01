@@ -43,7 +43,7 @@
         <button class="btn btn-light" id="logOutBtn">Logout</button>
     </div>
     <!--  Dashboard section-->
-    <section id="dashboardSection">
+    <section id="dashboardSection" >
         <div class="row mt-4">
             <div class="col-md-4">
                 <div class="card p-3 shadow-sm">
@@ -374,6 +374,7 @@
                         <th>Log ID</th>
                         <th>Date</th>
                         <th>Activity</th>
+                        <th>Image</th>
                         <th>Responsible Staff</th>
                         <th>Details</th>
                         <th>Actions</th>
@@ -383,6 +384,20 @@
                     <!-- Log entries will be dynamically added here -->
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <!-- Image Modal -->
+        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img id="modalImage" src="" alt="Large View" style="max-width: 100%; max-height: 80vh; object-fit: contain;">
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -3,7 +3,10 @@ import {cropList, fieldList, logList, staffList} from "../Db/db.js";
 let selectedFieldOfLog=[];
 let selectedCropOfLog=[];
 let selectedStaffOfLog=[];
+
 $(document).ready(function () {
+    const logManager = new GetAllLog('logsContainer');
+    logManager.loadLog();
 
 
     $("#fieldOfLog").on("input", function () {
@@ -256,5 +259,154 @@ $(document).on('click', '.delete-log', function() {
         console.log("Log deleted with code:", logCode);
     }
 });
+
+export class GetAllLog {
+    constructor(containerId) {
+        this.containerId = containerId;
+    }
+
+    // Fetch and load logs into the table
+    async loadLog() {
+        try {
+            const response = await fetch("http://localhost:5050/api/v1/log", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch logs: ${response.statusText}`);
+            }
+
+            const logs = await response.json();
+            console.log("Logs fetched:", logs);
+            logList.length = 0;
+            logList.push(...logs);
+
+            this.renderLogTable(logs);
+        } catch (error) {
+            console.error("Error loading logs:", error);
+        }
+    }
+
+    // Render the logs into the table
+    renderLogTable(logs) {
+        const logsContainer = document.getElementById(this.containerId);
+
+        // Clear existing rows
+        logsContainer.innerHTML = '';
+
+        logs.forEach((log) => {
+            const row = document.createElement("tr");
+            const image = log.observedImage
+                ? `<img src="data:image/jpeg;base64,${log.observedImage}" 
+                   alt="Observed Image" 
+                   style="max-width: 100px; max-height: 100px; object-fit: cover; cursor: pointer;" 
+                   class="log-image" 
+                   data-bs-toggle="modal" 
+                   data-bs-target="#imageModal" 
+                   data-image-src="data:image/jpeg;base64,${log.observedImage}">`
+                : "No Image";
+
+            row.innerHTML = `
+                <td>${log.logCode}</td>
+                <td>${log.logDate}</td>
+                <td>${log.logDetails}</td>
+                <td>${image}</td>
+                <td>${log.staff}</td>
+                <td>${log.details}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm update-log" data-log-id="${log.logCode}">Update</button>
+                    <button class="btn btn-danger btn-sm delete-log" data-log-id="${log.logCode}">Delete</button>
+                </td>
+            `;
+
+            logsContainer.appendChild(row);
+        });
+        this.attachImageClickHandler();
+
+        this.addActionListeners();
+
+    }
+    //open image modal
+    attachImageClickHandler() {
+        const images = document.querySelectorAll('.log-image');
+
+        images.forEach((img) => {
+            img.addEventListener('click', (event) => {
+                const imageSrc = event.target.getAttribute('data-image-src');
+                const modalImage = document.getElementById('modalImage');
+                modalImage.src = imageSrc;
+            });
+        });
+    }
+
+    // Add event listeners for Update and Delete buttons
+    addActionListeners() {
+        const updateButtons = document.querySelectorAll(".update-log");
+        const deleteButtons = document.querySelectorAll(".delete-log");
+
+        updateButtons.forEach((button) => {
+            button.addEventListener("click", (event) => this.handleUpdate(event));
+        });
+
+        deleteButtons.forEach((button) => {
+            button.addEventListener("click", (event) => this.handleDelete(event));
+        });
+    }
+
+    // Handle Update button click
+    handleUpdate(event) {
+        const logId = event.target.getAttribute("data-log-id");
+        console.log(`Update log with ID: ${logId}`);
+
+        // Fetch the log details and populate the modal form
+        const log = logList.find((log) => log.logCode === logId); // Assuming logList is globally available
+        if (log) {
+            document.getElementById("logId").value = log.logCode;
+            document.getElementById("logDate").value = log.logDate;
+            document.getElementById("activity").value = log.logDetails;
+           // document.getElementById("staffOfLog").value = log.staff;
+           // document.getElementById("cropOfLog").value = log.c; // Adjust as per your data
+            //document.getElementById("fieldOfLog").value = log.field; // Adjust as per your data
+            document.getElementById("details").value = log.logDetails;
+            document.getElementById("logModalLabel").textContent = "Update Log";
+            document.getElementById("submitLog").textContent = "Update Log";
+
+            // Show the modal
+            const logModal = new bootstrap.Modal(document.getElementById("logModal"));
+            logModal.show();
+        } else {
+            console.error("Log not found for update:", logId);
+        }
+    }
+
+    // Handle Delete button click
+    async handleDelete(event) {
+        const logId = event.target.getAttribute("data-log-id");
+        console.log(`Delete log with ID: ${logId}`);
+
+        if (confirm("Are you sure you want to delete this log?")) {
+            try {
+                const response = await fetch(`http://localhost:5050/api/v1/log/${logId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Failed to delete log: ${response.statusText}`);
+                }
+
+                console.log(`Log with ID ${logId} deleted successfully.`);
+                this.loadLog(); // Reload the table
+            } catch (error) {
+                console.error("Error deleting log:", error);
+            }
+        }
+    }
+}
 
 

@@ -38,6 +38,7 @@ $('#navCrops').on('click', () => {
     $('#vehicleSection').css('display', 'none');
     $('#equipmentSection').css('display', 'none');
     $('#userSection').css('display', 'none');
+    $('#dashboardSection').css('display', 'none');
     console.log("clicked");
 });
 $('#navDashboard').on('click', () => {
