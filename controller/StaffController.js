@@ -65,7 +65,7 @@ function getStaffList(){
     http.send();
 }
 function loadTable() {
-    // Empty the table before loading new data
+
     $('#staffContainer').empty();
 
     // Loop through the staff data and append rows to the table
