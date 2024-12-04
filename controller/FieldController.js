@@ -3,7 +3,7 @@ import {fieldList} from "../Db/db.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const fieldManager = new GetAllField('fieldContainer');
-    fieldManager.loadFields();
+     fieldManager.loadFields();
 });
 document.getElementById('fieldContainer').addEventListener('click', (event) => {
     if (event.target.classList.contains('update-field')) {
@@ -61,6 +61,9 @@ function saveField(formData) {
         data: formData,
         processData: false,
         contentType: false,
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('jwtToken')}`
+        },
         success: function(response) {
             console.log("Field saved successfully", response);
 
@@ -85,6 +88,9 @@ function updateField(formData) {
         data: formData,
         processData: false,
         contentType: false,
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem('jwtToken')}`
+        },
         success: function(response) {
             console.log("Field updated successfully", response);
             fieldManager.loadFields();
@@ -118,6 +124,7 @@ async function deleteField(fieldCode){
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem('jwtToken')}`
             },
         });
 
@@ -170,6 +177,7 @@ export class GetAllField {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem('jwtToken')}`
                 },
             });
 

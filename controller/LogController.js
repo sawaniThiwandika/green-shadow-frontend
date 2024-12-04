@@ -175,6 +175,10 @@ function saveLog(formData) {
         data: formData,
         processData: false,
         contentType: false,
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem('jwtToken')
+
+        },
         success: function (response) {
             console.log("log saved successfully", response);
             $('#logForm')[0].reset(); // Reset form after saving
@@ -196,6 +200,10 @@ function updateLog(logCode, formData) {
         data: formData,
         processData: false,
         contentType: false,
+        headers: {
+            "Authorization": "Bearer " + localStorage.getItem('jwtToken')
+
+        },
         success: function (response) {
             console.log("Log updated successfully", response);
             $('#logForm')[0].reset(); // Reset form after updating
@@ -272,6 +280,8 @@ export class GetAllLog {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem('jwtToken')
+
                 },
             });
 
@@ -393,6 +403,7 @@ export class GetAllLog {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
+                        "Authorization": "Bearer " + localStorage.getItem('jwtToken')
                     },
                 });
 

@@ -1,74 +1,72 @@
 import {StaffModel} from "../model/StaffModel.js";
 import {staffList} from "../Db/db.js";
 getStaffList();
-function getStaffList(){
-    const http = new XMLHttpRequest();
+console.log("jwt token : ",localStorage.getItem("jwtToken"))
+function getStaffList() {
+    const token = localStorage.getItem("jwtToken");
     staffList.length = 0;
 
-    http.onreadystatechange = () => {
-        if (http.readyState === 4) {
-            if (http.status === 200) {
-                let contentType = http.getResponseHeader("Content-Type");
-                console.log("Content type: " + contentType);
+    if (!token) {
+        alert("Authentication token not found. Please log in.");
+        window.location.href = "/login.html";
+        return;
+    }
 
-                if (contentType && contentType.includes("application/json")) {
-                    try {
-                        let response = JSON.parse(http.responseText);
-                        console.log("Response:", response);
+    $.ajax({
+        url: "http://localhost:5050/api/v1/staff",
+        type: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        },
+        success: function(response) {
+            // Check if the response is valid
+            if (Array.isArray(response)) {
+                response.forEach((staffData) => {
+                    const staffM = new StaffModel(
+                        staffData.id,
+                        staffData.firstName,
+                        staffData.lastName,
+                        staffData.designation,
+                        staffData.gender,
+                        staffData.joinedDate,
+                        staffData.dob,
+                        staffData.contactNo,
+                        staffData.email,
+                        staffData.addressLine1,
+                        staffData.addressLine2,
+                        staffData.addressLine3,
+                        staffData.addressLine4,
+                        staffData.addressLine5,
+                        staffData.role,
+                        staffData.fields,
+                        staffData.vehicle
+                    );
+                    staffList.push(staffM);
+                });
 
-                        response.forEach((staffData) => {
-                            const staffM = new StaffModel(
-                                staffData.id,
-                                staffData.firstName,
-                                staffData.lastName,
-                                staffData.designation,
-                                staffData.gender,
-                                staffData.joinedDate,
-                                staffData.dob,
-                                staffData.contactNo,
-                                staffData.email,
-                                staffData.addressLine1,
-                                staffData.addressLine2,
-                                staffData.addressLine3,
-                                staffData.addressLine4,
-                                staffData.addressLine5,
-                                staffData.role,
-                                staffData.fields,
-                                staffData.vehicle
-                            );
-                            staffList.push(staffM);
-                        });
-
-                        console.log(staffList);
-                        loadTable(); // Assuming this function populates a table with customer data
-
-                    } catch (e) {
-                        console.error("Failed to parse JSON response: ", e);
-                        console.error("Response text: ", http.responseText);
-                    }
-                } else {
-                    console.error("Unexpected content type: ", contentType);
-                    console.error("Response is not JSON: ", http.responseText);
-                }
+                console.log(staffList);
+                loadTable(); // Populate table with staff data
             } else {
-                console.error("Request failed with status: ", http.status);
-                console.error("Response text: ", http.responseText);
+                console.error("Invalid response format:", response);
             }
-        } else {
-            console.log("Processing stage: ", http.readyState);
+        },
+        error: function(xhr, status, error) {
+            console.error("Request failed with status:", status);
+            console.error("Error:", error);
+            console.error("Response text:", xhr.responseText);
+
+            if (xhr.status === 401) {
+                alert("Unauthorized access. Please log in again.");
+                window.location.href = "/login.html";
+            }
         }
-    };
-
-
-    // Use GET method to fetch customer list
-    http.open("GET", "http://localhost:5050/api/v1/staff", true);
-    http.send();
+    });
 }
+
 function loadTable() {
 
     $('#staffContainer').empty();
 
-    // Loop through the staff data and append rows to the table
     staffList.forEach(staff => {
         $('#staffContainer').append(`
             <tr data-staff-id="${staff.staffId}">
@@ -86,7 +84,7 @@ function loadTable() {
         `);
     });
 }
-$('#staffForm').on('submit', function(event) {
+$('#staffForm').on('submit', function (event) {
     event.preventDefault();
 
     const staffId = $('#staffId').val();
@@ -107,127 +105,95 @@ $('#staffForm').on('submit', function(event) {
     const fields = $('#fields').val();
     const vehicle = $('#vehicle').val();
 
+    const jsonData = JSON.stringify(new StaffModel(
+        staffId, firstName, lastName, designation, gender, joinedDate, dob,
+        contactNo, email, addressLine1, addressLine2, addressLine3,
+        addressLine4, addressLine5, role, fields, vehicle
+    ));
+
     const existingRow = $(`#staffContainer tr[data-staff-id="${staffId}"]`);
 
-    //Update staff
+    // Update staff
     if (existingRow.length > 0) {
+        // Update table row
         existingRow.find('td').eq(1).text(`${firstName} ${lastName}`);
         existingRow.find('td').eq(2).text(contactNo);
         existingRow.find('td').eq(3).text(email);
 
-        let existingStaff = staffList.find(staff => staff.id === staffId);
+        // Update staff in the staffList array
+        const existingStaff = staffList.find(staff => staff.id === staffId);
         if (existingStaff) {
-            existingStaff.firstName = firstName;
-            existingStaff.lastName = lastName;
-            existingStaff.designation = designation;
-            existingStaff.gender = gender;
-            existingStaff.joinedDate = joinedDate;
-            existingStaff.dob = dob;
-            existingStaff.addressLine1 = addressLine1;
-            existingStaff.addressLine2 = addressLine2;
-            existingStaff.addressLine3 = addressLine3;
-            existingStaff.addressLine4 = addressLine4;
-            existingStaff.addressLine5 = addressLine5;
-            existingStaff.contactNo = contactNo;
-            existingStaff.email = email;
-            existingStaff.role = role;
-            existingStaff.fields = fields;
-            existingStaff.vehicle = vehicle;
-
-            const jsonData = JSON.stringify(new StaffModel(
-                staffId, firstName, lastName, designation, gender, joinedDate, dob,
+            Object.assign(existingStaff, {
+                firstName, lastName, designation, gender, joinedDate, dob,
                 contactNo, email, addressLine1, addressLine2, addressLine3,
                 addressLine4, addressLine5, role, fields, vehicle
-            ));
-// Create and configure XMLHttpRequest
-            const http = new XMLHttpRequest();
-            http.onreadystatechange = () => {
-                if (http.readyState === 4) {
-                    if (http.status === 201) {
-                        console.log("Staff saved successfully");
-                        console.log("Response Text: ", http.responseText);
-                    } else {
-                        console.error("Request failed with status: ", http.status);
-                    }
-                }
-            };
-
-            // Open a connection and set the Content-Type header
-            http.open("PUT", "http://localhost:5050/api/v1/staff", true);
-            http.setRequestHeader("Content-Type", "application/json");
-
-            // Send the JSON data
-            http.send(jsonData);
-
-
-
+            });
         }
-    }
-    // add new staff
-    else {
-        //let validateStaff = validateStaff();
 
-        //if(validateStaff){
-        staffList.push(new StaffModel(staffId, firstName, lastName, designation, gender, joinedDate, dob, contactNo, email, addressLine1, addressLine2, addressLine3,
+        // Send PUT request
+        $.ajax({
+            url: "http://localhost:5050/api/v1/staff",
+            type: "PUT",
+            contentType: "application/json",
+            data: jsonData,
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem('jwtToken')
+
+            },
+            success: function (response) {
+                console.log("Staff updated successfully:", response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error updating staff:", status, error, xhr.responseText);
+            }
+        });
+
+    } else {
+
+        staffList.push(new StaffModel(staffId, firstName, lastName, designation, gender, joinedDate, dob,
+            contactNo, email, addressLine1, addressLine2, addressLine3,
             addressLine4, addressLine5, role, fields, vehicle));
 
 
-        // Append to staff table
         $('#staffContainer').append(`
-        <tr data-staff-id="${staffId}">
-            <td>${staffId}</td>
-            <td>${firstName} ${lastName}</td>
-            <td>${contactNo}</td>
-            <td>${email}</td>
-            <td>
-                <button class="btn btn-info btn-sm view-details" data-bs-toggle="modal" data-bs-target="#addStaffModal">Update</button>
-            </td>
-             <td>
-                <button class="btn btn-danger btn-sm delete-staff" data-bs-toggle="modal">Delete</button>
-            </td>
-        </tr>
-        }
-    `);
+            <tr data-staff-id="${staffId}">
+                <td>${staffId}</td>
+                <td>${firstName} ${lastName}</td>
+                <td>${contactNo}</td>
+                <td>${email}</td>
+                <td>
+                    <button class="btn btn-info btn-sm view-details" data-bs-toggle="modal" data-bs-target="#addStaffModal">Update</button>
+                </td>
+                <td>
+                    <button class="btn btn-danger btn-sm delete-staff" data-bs-toggle="modal">Delete</button>
+                </td>
+            </tr>
+        `);
 
-        // Create JSON payload
-        const jsonData = JSON.stringify(new StaffModel(
-            staffId, firstName, lastName, designation, gender, joinedDate, dob,
-            contactNo, email, addressLine1, addressLine2, addressLine3,
-            addressLine4, addressLine5, role, fields, vehicle
-        ));
+        // Send POST request
+        $.ajax({
+            url: "http://localhost:5050/api/v1/staff",
+            type: "POST",
+            contentType: "application/json",
+            data: jsonData,
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem('jwtToken')
 
-        // Create and configure XMLHttpRequest
-        const http = new XMLHttpRequest();
-        http.onreadystatechange = () => {
-            if (http.readyState === 4) {
-                if (http.status === 201) {
-                    console.log("Staff saved successfully");
-                    console.log("Response Text: ", http.responseText);
-                } else {
-                    console.error("Request failed with status: ", http.status);
-                }
+            },
+            success: function (response) {
+                console.log("Staff added successfully:", response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error adding staff:", status, error, xhr.responseText);
             }
-        };
-
-        // Open a connection and set the Content-Type header
-        http.open("POST", "http://localhost:5050/api/v1/staff", true);
-        http.setRequestHeader("Content-Type", "application/json");
-
-        // Send the JSON data
-        http.send(jsonData);
+        });
     }
-
-   //}
 
 
     $('#staffForm')[0].reset();
     $('#addStaffModal').modal('hide');
-
-
-
-
-
 });
+
 $('#addNewStaff').on('click', function() {
     $('#addStaffModalLabel').text('Add Staff');
     $('#submitBtnModal').text('Add Staff');
@@ -243,43 +209,37 @@ $(document).on('click', '.delete-staff', function() {
         row.remove();
         if (staffList[staffId]) {
             delete staffList[staffId];
-
-
-
-
         }
 
         console.log("Staff member deleted with ID:", staffId);
-        const idJSON = JSON.stringify({ id: staffId });
-        const http = new XMLHttpRequest();
-        //const http=new XMLHttpRequest().setRequestHeader("Content-Type","application/json");
-        http.onreadystatechange = () => {
-            if (http.readyState === 4) {
-                if (http.status === 200) {
-                    let contentType = http.getResponseHeader("Content-Type");
-                    console.log("content type "+http);
-                    if (contentType && contentType.includes("application/json")) {
-                        try {
-                            let response = JSON.parse(http.responseText);
-                            console.log(response);
-                        } catch (e) {
-                            console.error("Failed to parse JSON response: ", http.responseText);
-                        }
-                    } else {
-                        console.error("Unexpected content type: ", contentType);
-                        console.error("Response is not JSON: ", http.responseText);
-                    }
+
+        $.ajax({
+            url: `http://localhost:5050/api/v1/staff/${staffId}`,
+            type: 'DELETE',
+            contentType: 'application/json',
+            data: JSON.stringify({ id: staffId }),
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem('jwtToken')
+
+            },
+            success: function(response, textStatus, jqXHR) {
+                console.log("Staff member successfully deleted.");
+                if (jqXHR.getResponseHeader("Content-Type").includes("application/json")) {
+                    console.log("Response:", response);
                 } else {
-                    console.error("Failed with status: ", http.status);
-                    console.error("Processing stage: ", http.readyState);
+                    console.error("Unexpected content type:", jqXHR.getResponseHeader("Content-Type"));
+                    console.error("Response is not JSON:", response);
                 }
-            } else {
-                console.log("Processing stage: ", http.readyState);
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error("Error during deletion:", textStatus, errorThrown);
+                console.error("Failed with status:", jqXHR.status);
+                console.error("Response text:", jqXHR.responseText);
+            },
+            complete: function(jqXHR, textStatus) {
+                console.log("Ajax call completed with status:", textStatus);
             }
-        };
-        http.open("DELETE", `http://localhost:5050/api/v1/staff/${staffId}`, true);
-        http.setRequestHeader("Content-Type", "application/json");
-        http.send(idJSON);
+        });
     }
 });
 // View full details

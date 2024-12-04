@@ -2,66 +2,58 @@ import { VehicleModel } from "../model/VehicleModel.js";
 import { vehicleList} from "../Db/db.js";
 
 getVehicleList();
-function getVehicleList(){
-    const http = new XMLHttpRequest();
+function getVehicleList() {
     vehicleList.length = 0;
+    const token = localStorage.getItem("jwtToken");
 
-    http.onreadystatechange = () => {
-        if (http.readyState === 4) {
-            if (http.status === 200) {
-                let contentType = http.getResponseHeader("Content-Type");
-                console.log("Content type: " + contentType);
+    if (!token) {
+        alert("Authentication token not found. Please log in.");
+        window.location.href = "/login.html";
+        return;
+    }
 
-                if (contentType && contentType.includes("application/json")) {
-                    try {
-                        let response = JSON.parse(http.responseText);
-                        console.log("Response:", response);
+    $.ajax({
+        url: "http://localhost:5050/api/v1/vehicle",
+        type: "GET",
+        headers: {
+            "Authorization": `Bearer ${token}`
+        },
+        success: function(response) {
+            // Check if the response is valid
+            if (Array.isArray(response)) {
+                response.forEach((vehicleData) => {
+                    const staffId = vehicleData.staff ? vehicleData.staff.staffId : null;
 
-                        response.forEach((vehicleData) => {
-                            const staffId = vehicleData.staff ? vehicleData.staff.staffId : null; // Safely access staffId
+                    const vehicle = new VehicleModel(
+                        vehicleData.vehicleCode,
+                        vehicleData.vehicleLicensePlateNumber,
+                        vehicleData.vehicleCategory,
+                        vehicleData.vehicleFuelType,
+                        vehicleData.vehicleStatus,
+                        staffId,
+                        vehicleData.vehicleRemarks
+                    );
+                    vehicleList.push(vehicle);
+                });
 
-                            const vehicle = new VehicleModel(
-                                vehicleData.vehicleCode,
-                                vehicleData.vehicleLicensePlateNumber,
-                                vehicleData.vehicleCategory,
-                                vehicleData.vehicleFuelType,
-                                vehicleData.vehicleStatus,
-                                staffId,
-                                vehicleData.vehicleRemarks,
-
-                            );
-                            vehicleList.push(vehicle);
-                        });
-
-                        console.log(vehicleList);
-                        loadTable(); // Assuming this function populates a table with customer data
-
-                    } catch (e) {
-                        console.error("Failed to parse JSON response: ", e);
-                        console.error("Response text: ", http.responseText);
-                    }
-                } else {
-                    console.error("Unexpected content type: ", contentType);
-                    console.error("Response is not JSON: ", http.responseText);
-                }
+                console.log(vehicleList);
+                loadTable();
             } else {
-                console.error("Request failed with status: ", http.status);
-                console.error("Response text: ", http.responseText);
+                console.error("Invalid response format:", response);
             }
-        } else {
-            console.log("Processing stage: ", http.readyState);
+        },
+        error: function(xhr, status, error) {
+            console.error("Request failed with status:", status);
+            console.error("Error:", error);
+            console.error("Response text:", xhr.responseText);
         }
-    };
-
-
-    // Use GET method to fetch customer list
-    http.open("GET", "http://localhost:5050/api/v1/vehicle", true);
-    http.send();
+    });
 }
+
 function loadTable() {
     $('#vehicleContainer').empty();
 
-    // Loop through the staff data and append rows to the table
+
     vehicleList.forEach(vehicle => {
         $('#vehicleContainer').append(`
                 <tr data-code="${vehicle.vehicleCode}">
@@ -85,41 +77,22 @@ $(document).on('click', 'addNewVehicle', function () {
 });
 $(document).ready(function () {
 
-    // Handle vehicle form submission
-    $('#vehicleForm').on('submit', function (event) {
-        event.preventDefault();
-
-        // Collect vehicle form data
-        const vehicleCode = $('#vehicleCode').val();
-        const licensePlate = $('#licensePlate').val();
-        const vehicleCategory = $('#vehicleCategory').val();
-        const fuelType = $('#fuelType').val();
-        const status = $('#status').val();
-        const allocatedStaff = $('#allocatedStaff').val();
-        const remarks = $('#remarks').val();
-
-        // Check if we're updating an existing entry
-        const isUpdating = $('#vehicleCode').prop('readonly');
-        if (isUpdating) {
-            // Find and update the entry in vehicleList
-            const vehicle = vehicleList.find(v => v.vehicleCode === vehicleCode);
-            if (vehicle) {
-                vehicle.vehicleLicensePlateNumber = licensePlate;
-                vehicle.vehicleCategory = vehicleCategory;
-                vehicle.vehicleFuelType = fuelType;
-                vehicle.vehicleStatus = status;
-                vehicle.staffId = allocatedStaff;
-                vehicle.vehicleRemarks = remarks;
-            }
-
-            // Update the table row
-            const row = $('#vehicleContainer').find(`tr[data-code="${vehicleCode}"]`);
-            row.find('td:eq(1)').text(licensePlate);
-            row.find('td:eq(2)').text(vehicleCategory);
-            row.find('td:eq(3)').text(status);
-            row.find('td:eq(4)').text(allocatedStaff);
 
 
+
+        $('#vehicleForm').on('submit', function (event) {
+            event.preventDefault();
+
+            // Collect vehicle form data
+            const vehicleCode = $('#vehicleCode').val();
+            const licensePlate = $('#licensePlate').val();
+            const vehicleCategory = $('#vehicleCategory').val();
+            const fuelType = $('#fuelType').val();
+            const status = $('#status').val();
+            const allocatedStaff = $('#allocatedStaff').val();
+            const remarks = $('#remarks').val();
+
+            // Prepare FormData
             const formData = new FormData();
             formData.append("vehicleCode", vehicleCode);
             formData.append("vehicleLicensePlateNumber", licensePlate);
@@ -128,88 +101,79 @@ $(document).ready(function () {
             formData.append("vehicleStatus", status);
             formData.append("staffId", allocatedStaff);
             formData.append("vehicleRemarks", remarks);
-            // Create and configure XMLHttpRequest
-            const http = new XMLHttpRequest();
-            http.onreadystatechange = () => {
-                if (http.readyState === 4) {
-                    if (http.status === 201) {
-                        console.log("Vehicle updated successfully");
-                        console.log("Response Text: ", http.responseText);
+
+            // Check if we're updating an existing entry
+            const isUpdating = $('#vehicleCode').prop('readonly');
+            const ajaxOptions = {
+                url: isUpdating ? `http://localhost:5050/api/v1/vehicle` : `http://localhost:5050/api/v1/vehicle`,
+                type: isUpdating ? 'PUT' : 'POST',
+                data: formData,
+                processData: false, // Necessary for FormData
+                contentType: false, // Necessary for FormData
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+                },
+                success: function (response) {
+                    console.log(isUpdating ? "Vehicle updated successfully" : "Vehicle saved successfully");
+                    console.log("Response:", response);
+
+                    if (isUpdating) {
+                        // Update the table row
+                        const row = $('#vehicleContainer').find(`tr[data-code="${vehicleCode}"]`);
+                        row.find('td:eq(1)').text(licensePlate);
+                        row.find('td:eq(2)').text(vehicleCategory);
+                        row.find('td:eq(3)').text(status);
+                        row.find('td:eq(4)').text(allocatedStaff);
+
+                        // Update the vehicleList entry
+                        const vehicle = vehicleList.find(v => v.vehicleCode === vehicleCode);
+                        if (vehicle) {
+                            vehicle.vehicleLicensePlateNumber = licensePlate;
+                            vehicle.vehicleCategory = vehicleCategory;
+                            vehicle.vehicleFuelType = fuelType;
+                            vehicle.vehicleStatus = status;
+                            vehicle.staffId = allocatedStaff;
+                            vehicle.vehicleRemarks = remarks;
+                        }
                     } else {
-                        console.error("Request failed with status: ", http.status);
+                        // Add a new row to the table
+                        $('#vehicleContainer').append(`
+                        <tr data-code="${vehicleCode}">
+                            <td>${vehicleCode}</td>
+                            <td>${licensePlate}</td>
+                            <td>${vehicleCategory}</td>
+                            <td>${status}</td>
+                            <td>${allocatedStaff}</td>
+                            <td>
+                                <button class="btn btn-info btn-sm view-details-vehicle">View</button>
+                                <button class="btn btn-warning btn-sm update-vehicle">Update</button>
+                                <button class="btn btn-danger btn-sm delete-vehicle">Delete</button>
+                            </td>
+                        </tr>
+                    `);
+
+                        // Add to vehicleList
+                        const newVehicle = new VehicleModel(vehicleCode, licensePlate, vehicleCategory, fuelType, status, allocatedStaff, remarks);
+                        vehicleList.push(newVehicle);
                     }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("Request failed:", textStatus, errorThrown);
+                    console.error("Status:", jqXHR.status);
+                    console.error("Response Text:", jqXHR.responseText);
                 }
             };
 
-            // Open a connection and set the Content-Type header
-            http.open("PUT", "http://localhost:5050/api/v1/vehicle", true);
-            // http.setRequestHeader("Content-Type", "multipart/form-data");
 
-            // Send the Form data
-            http.send(formData);
+            $.ajax(ajaxOptions);
 
 
-
-        } else {
-            // Add new vehicle to the list
-            const newVehicle = new VehicleModel(vehicleCode, licensePlate, vehicleCategory, fuelType, status, allocatedStaff, remarks);
-            vehicleList.push(newVehicle);
-
-            // Append new row to vehicle table
-            $('#vehicleContainer').append(`
-                <tr data-code="${vehicleCode}">
-                    <td>${vehicleCode}</td>
-                    <td>${licensePlate}</td>vehicleCode, licensePlate, vehicleCategory, fuelType, status, allocatedStaff, remarks
-                    <td>${vehicleCategory}</td>
-                    <td>${status}</td>
-                    <td>${allocatedStaff}</td>
-                    <td>
-                        <button class="btn btn-info btn-sm view-details-vehicle">View</button>
-                        <button class="btn btn-warning btn-sm update-vehicle">Update</button>
-                        <button class="btn btn-danger btn-sm delete-vehicle">Delete</button>
-                    </td>
-                </tr>
-            `);
+            $('#vehicleForm')[0].reset();
+            $('#addVehicleModal').modal('hide');
+            $('#vehicleCode').prop('readonly', false);
+        });
 
 
-            // Create JSON payload
-            //const jsonData = JSON.stringify(new VehicleModel(vehicleCode, licensePlate, vehicleCategory, fuelType, status, allocatedStaff, remarks));
-
-            const formData = new FormData();
-            formData.append("vehicleCode", vehicleCode);
-            formData.append("vehicleLicensePlateNumber", licensePlate);
-            formData.append("vehicleCategory", vehicleCategory);
-            formData.append("vehicleFuelType", fuelType);
-            formData.append("vehicleStatus", status);
-            formData.append("staffId", allocatedStaff);
-            formData.append("vehicleRemarks", remarks);
-            // Create and configure XMLHttpRequest
-            const http = new XMLHttpRequest();
-            http.onreadystatechange = () => {
-                if (http.readyState === 4) {
-                    if (http.status === 201) {
-                        console.log("Vehicle saved successfully");
-                        console.log("Response Text: ", http.responseText);
-                    } else {
-                        console.error("Request failed with status: ", http.status);
-                    }
-                }
-            };
-
-            // Open a connection and set the Content-Type header
-            http.open("POST", "http://localhost:5050/api/v1/vehicle", true);
-           // http.setRequestHeader("Content-Type", "multipart/form-data");
-
-            // Send the Form data
-            http.send(formData);
-
-        }
-
-        // Reset form and close modal
-        $('#vehicleForm')[0].reset();
-        $('#addVehicleModal').modal('hide');
-        $('#vehicleCode').prop('readonly', false); // Make vehicleCode editable again
-    });
 
     // View full details of a vehicle
     $(document).on('click', '.view-details-vehicle', function () {
@@ -256,6 +220,12 @@ $(document).ready(function () {
         const row = $(this).closest('tr');
         const vehicleCode = row.find('td:eq(0)').text();
 
+        // Confirm deletion
+        const confirmDelete = confirm("Are you sure you want to delete this vehicle?");
+        if (!confirmDelete) {
+            return;
+        }
+
         // Remove from vehicleList
         const vehicleIndex = vehicleList.findIndex(v => v.vehicleCode === vehicleCode);
         if (vehicleIndex !== -1) vehicleList.splice(vehicleIndex, 1);
@@ -264,36 +234,30 @@ $(document).ready(function () {
         row.remove();
 
         console.log("Vehicle deleted with ID:", vehicleCode);
-        const idJSON = JSON.stringify({ id: vehicleCode });
-        const http = new XMLHttpRequest();
-        //const http=new XMLHttpRequest().setRequestHeader("Content-Type","application/json");
-        http.onreadystatechange = () => {
-            if (http.readyState === 4) {
-                if (http.status === 200) {
-                    let contentType = http.getResponseHeader("Content-Type");
-                    console.log("content type "+http);
-                    if (contentType && contentType.includes("application/json")) {
-                        try {
-                            let response = JSON.parse(http.responseText);
-                            console.log(response);
-                        } catch (e) {
-                            console.error("Failed to parse JSON response: ", http.responseText);
-                        }
-                    } else {
-                        console.error("Unexpected content type: ", contentType);
-                        console.error("Response is not JSON: ", http.responseText);
-                    }
-                } else {
-                    console.error("Failed with status: ", http.status);
-                    console.error("Processing stage: ", http.readyState);
-                }
-            } else {
-                console.log("Processing stage: ", http.readyState);
-            }
-        };
-        http.open("DELETE", `http://localhost:5050/api/v1/vehicle/${vehicleCode}`, true);
-        http.setRequestHeader("Content-Type", "application/json");
-        http.send(idJSON);
 
+        // Perform AJAX DELETE request
+        $.ajax({
+            url: `http://localhost:5050/api/v1/vehicle/${vehicleCode}`,
+            type: 'DELETE',
+            contentType: 'application/json',
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+            },
+
+            data: JSON.stringify({ id: vehicleCode }),
+            success: function (response) {
+                console.log("Vehicle deleted successfully.");
+                console.log("Response:", response);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("Request failed:", textStatus, errorThrown);
+                console.error("Failed with status:", jqXHR.status);
+                console.error("Response Text:", jqXHR.responseText);
+            },
+            complete: function (jqXHR, textStatus) {
+                console.log("AJAX call completed with status:", textStatus);
+            }
+        });
     });
+
 });

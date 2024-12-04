@@ -1,28 +1,51 @@
-const users = [
-    { email: "sawani.wh@gmail.com", password: "1" },
-    { email: "thiwandika.whs@gmail.com", password: "123" }
-];
+document.getElementById("signInForm").addEventListener("submit", function (event) {
+    event.preventDefault(); // Prevent form submission
 
-document.querySelector('#loginBtn').addEventListener('click', handleLogin);
+    const email = document.getElementById("emailLogin").value;
+    const password = document.getElementById("passwordLogin").value;
+    const rememberMe = document.getElementById("remember").checked;
 
-function checkCredentials(email, password) {
-    return users.some(user => user.email === email && user.password === password);
-}
-
-function handleLogin(event) {
-    event.preventDefault();
-    const emailInput = document.querySelector('#emailLogin');
-    const passwordInput = document.querySelector('#passwordLogin');
-    const email = emailInput.value;
-    const password = passwordInput.value;
-
-    if (checkCredentials(email, password)) {
-        alert('Login successful!');
-        window.location.href = 'pages.html';
-    } else {
-        alert('Invalid email or password. Please try again.');
+    // Validate inputs
+    if (!email || !password) {
+        alert("Please fill in all fields.");
+        return;
     }
+
+    // Send login request
+    fetch("http://localhost:5050/api/v1/auth/signIn", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Failed to authenticate. Please check your credentials.");
+            }
+
+            return response.json();
+        })
+        .then((data) => {
+            const token = data.token;
+            console.log(token)
+            if (rememberMe) {
+                localStorage.setItem("jwtToken", token);
+            } else {
+                sessionStorage.setItem("jwtToken", token);
+            }
+
+            alert("Login successful!");
+            window.location.href = "./pages.html";
+        })
+        .catch((error) => {
+            console.error("Error during login:", error);
+            alert(error.message);
+        });
+});
+
+
+function showSignUp() {
+    alert("Redirecting to sign-up page...");
+    window.location.href = "/signup.html";
 }
-
-
-

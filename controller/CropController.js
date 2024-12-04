@@ -1,9 +1,10 @@
 import {cropList,fieldList} from "../Db/db.js";
 let selectedFieldListOfCrop = [];
-let editCropId = null;
+
+
 $(document).ready(function () {
     const fieldManager = new GetAllCrop('cropContainer');
-    fieldManager.loadCrop();
+     fieldManager.loadCrop();
 
     $("#fieldDetailsCrop").on("input", function () {
         populateDatalistFields();
@@ -104,6 +105,9 @@ $(document).ready(function () {
             data: formData,
             processData: false,
             contentType: false,
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('jwtToken')}`
+            },
             success: function (response) {
                 console.log("Crop saved successfully", response);
                 $('#cropForm')[0].reset(); // Reset form after saving
@@ -125,6 +129,9 @@ $(document).ready(function () {
             data: formData,
             processData: false,
             contentType: false,
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('jwtToken')}`
+            },
             success: function (response) {
                 console.log("Crop updated successfully", response);
                 $('#cropForm')[0].reset(); // Reset form after updating
@@ -183,6 +190,7 @@ $(document).ready(function () {
             const response = await fetch(`http://localhost:5050/api/v1/crop/${cropCode}`, {
                 method: "DELETE",
                 headers: {
+                    Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
                     "Content-Type": "application/json",
                 },
             });
@@ -211,12 +219,16 @@ export class GetAllCrop {
         this.containerId = containerId;
     }
     async loadCrop() {
+
         try {
             const response = await fetch("http://localhost:5050/api/v1/crop", {
                 method: "GET",
                 headers: {
-                    "Content-Type": "application/json",
+
+                    Authorization: `Bearer ${localStorage.getItem('jwtToken')}`
+
                 },
+
             });
 
             if (!response.ok) {
