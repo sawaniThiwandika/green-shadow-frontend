@@ -1,11 +1,50 @@
 import { EquipmentModel } from "../model/EquipmentModel.js";
-import { equipmentList } from "../Db/db.js";
+import {equipmentList, fieldList, staffList} from "../Db/db.js";
+let selectedFieldOfEquipment=[];
+let selectedStaffOfEquipment=[];
+$(document).ready(function () {
 
-$(document).ready(function() {
+    $("#equipmentAssignedStaff").on("input", function () {
+        function populateDatalistStaffInEquipment() {
+            var datalistForEquipment = $("#staffListForEquipment");
+            datalistForEquipment.empty();
+            $.each(staffList, function(index, staff) {
+                datalistForEquipment.append($("<option>", { value:staff.email}));
+            });
+        }
+        populateDatalistStaffInEquipment();
+
+
+
+    });
+    $("#equipmentAssignedStaff").on("keydown", function (event) {
+        if (event.key === "Enter") {
+
+            const selectedValue = $(this).val();
+            let staff=isValidStaffMem(selectedValue);
+            if ( staff!= null) {
+                if (!selectedStaffOfEquipment.includes(staff.id)) {
+                    selectedStaffOfEquipment.push(staff.id);
+                    console.log("Selected staff:", selectedStaffOfEquipment);
+                } else {
+                    console.log("Equipment already selected:", selectedValue);
+                }
+            } else {
+                console.error("Invalid Equipment selected:", selectedValue);
+            }
+            $(this).val("");
+        }
+    });
+    function isValidStaffMem(email) {
+        const staff = staffList.find(staff => staff.email === email);
+        return staff || null;
+    }
+
 
     // Handle equipment form submission (Add or Update)
-    $('#equipmentForm').on('submit', function(event) {
+    $('#equipmentForm').on('submit', function (event) {
         event.preventDefault();
+
         // Collect equipment form data
         const equipmentId = $('#equipmentId').val();
         const name = $('#equipmentName').val();
@@ -14,14 +53,17 @@ $(document).ready(function() {
         const assignedStaff = $('#equipmentAssignedStaff').val();
         const assignedField = $('#equipmentAssignedField').val();
 
+        const jsonData = JSON.stringify(new EquipmentModel(
+            equipmentId, name, type, status, assignedStaff, assignedField
+        ));
+
         // Check if equipment ID already exists for update, else add new
         const existingEquipment = equipmentList.find(eq => eq.equipmentId === equipmentId);
 
         if (existingEquipment) {
-            // Update existing equipment
-            existingEquipment.equipmentId = equipmentId;
+            // Update existing equipment in equipmentList
             existingEquipment.equipmentName = name;
-            existingEquipment.equipmentType= type;
+            existingEquipment.equipmentType = type;
             existingEquipment.equipmentStatus = status;
             existingEquipment.equipmentAssignedStaff = assignedStaff;
             existingEquipment.equipmentAssignedField = assignedField;
@@ -33,9 +75,24 @@ $(document).ready(function() {
             row.find('td:eq(3)').text(status);
             row.find('td:eq(4)').text(assignedStaff);
             row.find('td:eq(5)').text(assignedField);
+
+            // Send PUT request to backend
+            $.ajax({
+                url: `http://localhost:5050/api/v1/equipment/${equipmentId}`,
+                type: "PUT",
+                contentType: "application/json",
+                data: jsonData,
+                success: function (response) {
+                    console.log("Equipment updated successfully:", response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error updating equipment:", status, error, xhr.responseText);
+                }
+            });
+
         } else {
-            // Add new equipment
-            const newEquipment = new EquipmentModel(equipmentId,name,type,status,assignedStaff,assignedField);
+            // Add new equipment to equipmentList
+            const newEquipment = new EquipmentModel(equipmentId, name, type, status, assignedStaff, assignedField);
             equipmentList.push(newEquipment);
 
             // Append new row to equipment table
@@ -54,6 +111,20 @@ $(document).ready(function() {
                     </td>
                 </tr>
             `);
+
+            // Send POST request to backend
+            $.ajax({
+                url: "http://localhost:5050/api/v1/equipment",
+                type: "POST",
+                contentType: "application/json",
+                data: jsonData,
+                success: function (response) {
+                    console.log("Equipment added successfully:", response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error adding equipment:", status, error, xhr.responseText);
+                }
+            });
         }
 
         // Reset form and close modal
@@ -62,7 +133,7 @@ $(document).ready(function() {
     });
 
     // View full details of equipment for updating
-    $(document).on('click', '.update-equipment', function() {
+    $(document).on('click', '.update-equipment', function () {
         const row = $(this).closest('tr');
         const equipmentId = row.data('id');
         const equipment = equipmentList.find(eq => eq.equipmentId === equipmentId);
@@ -79,7 +150,7 @@ $(document).ready(function() {
     });
 
     // Delete equipment entry
-    $(document).on('click', '.delete-equipment', function() {
+    $(document).on('click', '.delete-equipment', function () {
         const row = $(this).closest('tr');
         const equipmentId = row.data('id');
 
@@ -89,5 +160,17 @@ $(document).ready(function() {
 
         // Remove row from table
         row.remove();
+
+        // Send DELETE request to backend
+        $.ajax({
+            url: `http://localhost:5050/api/v1/equipment/${equipmentId}`,
+            type: "DELETE",
+            success: function (response) {
+                console.log("Equipment deleted successfully:", response);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error deleting equipment:", status, error, xhr.responseText);
+            }
+        });
     });
 });

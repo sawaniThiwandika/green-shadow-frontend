@@ -601,12 +601,14 @@
                             </div>
                             <div class="mb-3">
                                 <label for="equipmentAssignedStaff" class="form-label">Assigned Staff</label>
-                                <input type="text" class="form-control" id="equipmentAssignedStaff" placeholder="Enter assigned staff (or N/A)" required>
+                                <input type="text" class="form-control" id="equipmentAssignedStaff" placeholder="Enter assigned staff (or N/A)" required list="staffListForEquipment">
                             </div>
+                            <datalist id="staffListForEquipment"></datalist>
                             <div class="mb-3">
                                 <label for="equipmentAssignedField" class="form-label">Assigned Field</label>
-                                <input type="text" class="form-control" id="equipmentAssignedField" placeholder="Enter assigned field (or N/A)" required>
+                                <input type="text" class="form-control" id="equipmentAssignedField" placeholder="Enter assigned field (or N/A)" required list="fieldListForEquipment">
                             </div>
+                            <datalist id="fieldListForEquipment"></datalist>
                             <button type="submit" class="btn btn-success w-100" id="submitEquipment">Add Equipment</button>
                         </form>
                     </div>
