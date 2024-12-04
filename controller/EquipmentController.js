@@ -39,6 +39,42 @@ $(document).ready(function () {
         const staff = staffList.find(staff => staff.email === email);
         return staff || null;
     }
+    //populate field data list in equipment modal
+    $("#equipmentAssignedField").on("input", function () {
+        function populateDatalistFieldInEquipment() {
+            var datalistForFields = $("#fieldListForEquipment");
+            datalistForFields.empty();
+            $.each(fieldList, function(index, field) {
+                datalistForFields.append($("<option>", { value: field.fieldName}));
+            });
+        }
+        populateDatalistFieldInEquipment();
+
+
+
+    });
+    $("#equipmentAssignedField").on("keydown", function (event) {
+        if (event.key === "Enter") {
+
+            const selectedValue = $(this).val();
+            let field=isValidField(selectedValue);
+            if ( field!= null) {
+                if (!selectedFieldOfEquipment.includes(field.fieldCode)) {
+                    selectedFieldOfEquipment.push(field.fieldCode);
+                    console.log("Selected fields:", selectedFieldOfEquipment);
+                } else {
+                    console.log("Field already selected:", selectedValue);
+                }
+            } else {
+                console.error("Invalid field selected:", selectedValue);
+            }
+            $(this).val("");
+        }
+    });
+    function isValidField(fieldName) {
+        const field = fieldList.find(field => field.fieldName === fieldName);
+        return field || null;
+    }
 
 
     // Handle equipment form submission (Add or Update)
