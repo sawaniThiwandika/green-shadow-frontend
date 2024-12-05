@@ -612,9 +612,33 @@
                             <button type="submit" class="btn btn-success w-100" id="submitEquipment">Add Equipment</button>
                         </form>
                     </div>
+
+
                 </div>
             </div>
         </div>
+
+        <div id="viewEquipmentModal" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Equipment Details</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>ID: <span id="viewEquipmentId"></span></p>
+                        <p>Name: <span id="viewEquipmentName"></span></p>
+                        <p>Type: <span id="viewEquipmentType"></span></p>
+                        <p>Status: <span id="viewEquipmentStatus"></span></p>
+                        <p>Assigned Staff: <span id="viewAssignedStaff"></span></p>
+                        <p>Assigned Fields: <span id="viewAssignedFields"></span></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </section>
 
     <!-- User Section -->

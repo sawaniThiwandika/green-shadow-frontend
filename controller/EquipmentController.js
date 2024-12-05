@@ -1,17 +1,21 @@
-import { EquipmentModel } from "../model/EquipmentModel.js";
+import {EquipmentModel} from "../model/EquipmentModel.js";
 import {equipmentList, fieldList, staffList} from "../Db/db.js";
+
 let selectedFieldOfEquipment=[];
 let selectedStaffOfEquipment=[];
 $(document).ready(function () {
+    // Initialize the table on page load
+    fetchAllEquipment();
 
     $("#equipmentAssignedStaff").on("input", function () {
         function populateDatalistStaffInEquipment() {
             var datalistForEquipment = $("#staffListForEquipment");
             datalistForEquipment.empty();
-            $.each(staffList, function(index, staff) {
-                datalistForEquipment.append($("<option>", { value:staff.email}));
+            $.each(staffList, function (index, staff) {
+                datalistForEquipment.append($("<option>", {value: staff.email}));
             });
         }
+
         populateDatalistStaffInEquipment();
 
 
@@ -86,38 +90,43 @@ $(document).ready(function () {
         const name = $('#equipmentName').val();
         const type = $('#equipmentType').val();
         const status = $('#equipmentStatus').val();
-        const assignedStaff = $('#equipmentAssignedStaff').val();
-        const assignedField = $('#equipmentAssignedField').val();
 
-        const jsonData = JSON.stringify(new EquipmentModel(
-            equipmentId, name, type, status, assignedStaff, assignedField
-        ));
+        // Create FormData object
+        const formData = new FormData();
+        formData.append("equipmentId", equipmentId);
+        formData.append("equipmentName", name);
+        formData.append("equipmentType", type);
+        formData.append("equipmentStatus", status);
+        formData.append("equipmentAssignedStaff", JSON.stringify(selectedStaffOfEquipment));
+        formData.append("equipmentAssignedField", JSON.stringify(selectedFieldOfEquipment));
 
-        // Check if equipment ID already exists for update, else add new
+
         const existingEquipment = equipmentList.find(eq => eq.equipmentId === equipmentId);
 
         if (existingEquipment) {
-            // Update existing equipment in equipmentList
             existingEquipment.equipmentName = name;
             existingEquipment.equipmentType = type;
             existingEquipment.equipmentStatus = status;
-            existingEquipment.equipmentAssignedStaff = assignedStaff;
-            existingEquipment.equipmentAssignedField = assignedField;
+            existingEquipment.equipmentAssignedStaff = selectedStaffOfEquipment;
+            existingEquipment.equipmentAssignedField = selectedFieldOfEquipment;
 
             // Update row in table
             const row = $(`#equipmentContainer tr[data-id="${equipmentId}"]`);
             row.find('td:eq(1)').text(name);
             row.find('td:eq(2)').text(type);
             row.find('td:eq(3)').text(status);
-            row.find('td:eq(4)').text(assignedStaff);
-            row.find('td:eq(5)').text(assignedField);
 
-            // Send PUT request to backend
+            // Send PUT request to backend with FormData
             $.ajax({
-                url: `http://localhost:5050/api/v1/equipment/${equipmentId}`,
+                url: `http://localhost:5050/api/v1/equipment`,
                 type: "PUT",
-                contentType: "application/json",
-                data: jsonData,
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem('jwtToken')
+
+                },
                 success: function (response) {
                     console.log("Equipment updated successfully:", response);
                 },
@@ -125,10 +134,9 @@ $(document).ready(function () {
                     console.error("Error updating equipment:", status, error, xhr.responseText);
                 }
             });
-
         } else {
             // Add new equipment to equipmentList
-            const newEquipment = new EquipmentModel(equipmentId, name, type, status, assignedStaff, assignedField);
+            const newEquipment = new EquipmentModel(equipmentId, name, type, status, selectedStaffOfEquipment, selectedFieldOfEquipment);
             equipmentList.push(newEquipment);
 
             // Append new row to equipment table
@@ -138,8 +146,8 @@ $(document).ready(function () {
                     <td>${name}</td>
                     <td>${type}</td>
                     <td>${status}</td>
-                    <td>${assignedStaff}</td>
-                    <td>${assignedField}</td>
+                    <td>${selectedStaffOfEquipment}</td>
+                    <td>${selectedFieldOfEquipment}</td>
                     <td>
                         <button class="btn btn-info btn-sm view-details-equipment">View</button>
                         <button class="btn btn-warning btn-sm update-equipment">Update</button>
@@ -148,12 +156,17 @@ $(document).ready(function () {
                 </tr>
             `);
 
-            // Send POST request to backend
+            // Send POST request to backend with FormData
             $.ajax({
                 url: "http://localhost:5050/api/v1/equipment",
                 type: "POST",
-                contentType: "application/json",
-                data: jsonData,
+                data: formData,
+                processData: false,
+                contentType: false,
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem('jwtToken')
+
+                },
                 success: function (response) {
                     console.log("Equipment added successfully:", response);
                 },
@@ -168,24 +181,8 @@ $(document).ready(function () {
         $('#addEquipmentModal').modal('hide');
     });
 
-    // View full details of equipment for updating
-    $(document).on('click', '.update-equipment', function () {
-        const row = $(this).closest('tr');
-        const equipmentId = row.data('id');
-        const equipment = equipmentList.find(eq => eq.equipmentId === equipmentId);
 
-        // Fill form with existing details for update
-        $('#equipmentId').val(equipment.equipmentId).prop('readonly', true);
-        $('#equipmentName').val(equipment.equipmentName);
-        $('#equipmentType').val(equipment.equipmentType);
-        $('#equipmentStatus').val(equipment.equipmentStatus);
-        $('#equipmentAssignedStaff').val(equipment.equipmentAssignedStaff);
-        $('#equipmentAssignedField').val(equipment.equipmentAssignedField);
-
-        $('#addEquipmentModal').modal('show');
-    });
-
-    // Delete equipment entry
+    // Delete equipment
     $(document).on('click', '.delete-equipment', function () {
         const row = $(this).closest('tr');
         const equipmentId = row.data('id');
@@ -201,6 +198,10 @@ $(document).ready(function () {
         $.ajax({
             url: `http://localhost:5050/api/v1/equipment/${equipmentId}`,
             type: "DELETE",
+            headers: {
+                "Authorization": "Bearer " + localStorage.getItem('jwtToken')
+
+            },
             success: function (response) {
                 console.log("Equipment deleted successfully:", response);
             },
@@ -209,4 +210,115 @@ $(document).ready(function () {
             }
         });
     });
+
+    // Fetch all equipment records
+    async function fetchAllEquipment() {
+        try {
+            const response = await fetch("http://localhost:5050/api/v1/equipment", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem('jwtToken')
+
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch equipments: ${response.statusText}`);
+            }
+
+            const equipments = await response.json();
+            console.log("Equipments fetched:", equipments);
+            equipmentList.length = 0;
+            equipmentList.push(...equipments);
+
+            populateEquipmentTable(equipments);
+        } catch (error) {
+            console.error("Error loading equipments:", error);
+        }
+    }
+
+    // Populate the equipment table
+    function populateEquipmentTable(equipments) {
+        const tableBody = $('#equipmentContainer');
+        tableBody.empty();
+
+        equipments.forEach((equipment) => {
+
+            const assignedFields = equipment.fieldEquipmentDetails
+                ? equipment.fieldEquipmentDetails.map(field => field.fieldId).join(", ")
+                : "None";
+            const assignedStaff = equipment.staffEquipmentDetails
+                ? equipment.staffEquipmentDetails.map(staff => staff.staffId).join(", ")
+                : "None";
+
+            const row = `
+            <tr>
+                <td>${equipment.equipmentId}</td>
+                <td>${equipment.equipmentName}</td>
+                <td>${equipment.equipmentType}</td>
+                <td>${equipment.equipmentStatus}</td>
+                <td>${assignedStaff}</td>
+                <td>${assignedFields}</td>
+                <td>
+                    <button class="btn btn-info btn-sm view-details-equipment" data-id="${equipment.equipmentId}">View</button>
+                    <button class="btn btn-warning btn-sm update-equipment" data-id="${equipment.equipmentId}">Update</button>
+                    <button class="btn btn-danger btn-sm delete-equipment" data-id="${equipment.equipmentId}">Delete</button>
+                </td>
+            </tr>
+        `;
+            tableBody.append(row);
+        });
+    }
+
+    $(document).on('click', '.view-details-equipment', function () {
+        const equipmentId = $(this).data('id');
+        const equipment = equipmentList.find(eq => eq.equipmentId === equipmentId);
+
+        if (equipment) {
+
+            $('#viewEquipmentId').text(equipment.equipmentId);
+            $('#viewEquipmentName').text(equipment.equipmentName);
+            $('#viewEquipmentType').text(equipment.equipmentType);
+            $('#viewEquipmentStatus').text(equipment.equipmentStatus);
+
+            $('#viewAssignedStaff').text(
+                equipment.staffEquipmentDetails.map(staff => staff.staffId).join(", ") || "None"
+            );
+            $('#viewAssignedFields').text(
+                equipment.fieldEquipmentDetails.map(field => field.fieldId).join(", ") || "None"
+            );
+
+            $('#viewEquipmentModal').modal('show');
+        } else {
+            console.error("Equipment not found for viewing.");
+        }
+    });
+
+    $(document).on('click', '.update-equipment', function () {
+        const equipmentId = $(this).data('id');
+        console.log('Clicked equipment ID:', equipmentId);
+        const equipment = equipmentList.find(eq => eq.equipmentId === equipmentId);
+
+        if (equipment) {
+
+            document.getElementById("equipmentId").value = equipment.equipmentId;
+            document.getElementById("equipmentName").value = equipment.equipmentName;
+            document.getElementById("equipmentType").value = equipment.equipmentType;
+            document.getElementById("equipmentStatus").value = equipment.equipmentStatus;
+
+            document.getElementById("equipmentAssignedStaff").value = equipment.staffEquipmentDetails.map(staff => staff.staffId).join(", ");
+            document.getElementById("equipmentAssignedField").value = equipment.fieldEquipmentDetails.map(field => field.fieldId).join(", ");
+
+            document.getElementById('addEquipmentModalLabel').innerText = 'Update Equipment';
+            const submitButton = document.getElementById('submitEquipment');
+            submitButton.innerText = 'Update Equipment'
+
+            $('#addEquipmentModal').modal('show');
+        } else {
+            console.error('Equipment not found with ID:', equipmentId);
+        }
+    });
+
+
 });
