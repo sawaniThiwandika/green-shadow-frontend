@@ -86,76 +86,76 @@ function loadTable() {
 }
 $('#staffForm').on('submit', function (event) {
     event.preventDefault();
+    if(validateForm()) {
+        const staffId = $('#staffId').val();
+        const firstName = $('#firstName').val();
+        const lastName = $('#lastName').val();
+        const designation = $('#designation').val();
+        const gender = $('#gender').val();
+        const joinedDate = $('#joinedDate').val();
+        const dob = $('#dob').val();
+        const addressLine1 = $('#addressLine1').val().trim();
+        const addressLine2 = $('#addressLine2').val().trim();
+        const addressLine3 = $('#addressLine3').val().trim();
+        const addressLine4 = $('#addressLine4').val().trim();
+        const addressLine5 = $('#addressLine5').val().trim();
+        const contactNo = $('#contactNo').val();
+        const email = $('#email').val();
+        const role = $('#role').val();
+        const fields = $('#fields').val();
+        const vehicle = $('#vehicle').val();
 
-    const staffId = $('#staffId').val();
-    const firstName = $('#firstName').val();
-    const lastName = $('#lastName').val();
-    const designation = $('#designation').val();
-    const gender = $('#gender').val();
-    const joinedDate = $('#joinedDate').val();
-    const dob = $('#dob').val();
-    const addressLine1 = $('#addressLine1').val().trim();
-    const addressLine2 = $('#addressLine2').val().trim();
-    const addressLine3 = $('#addressLine3').val().trim();
-    const addressLine4 = $('#addressLine4').val().trim();
-    const addressLine5 = $('#addressLine5').val().trim();
-    const contactNo = $('#contactNo').val();
-    const email = $('#email').val();
-    const role = $('#role').val();
-    const fields = $('#fields').val();
-    const vehicle = $('#vehicle').val();
-
-    const jsonData = JSON.stringify(new StaffModel(
-        staffId, firstName, lastName, designation, gender, joinedDate, dob,
-        contactNo, email, addressLine1, addressLine2, addressLine3,
-        addressLine4, addressLine5, role, fields, vehicle
-    ));
-
-    const existingRow = $(`#staffContainer tr[data-staff-id="${staffId}"]`);
-
-    // Update staff
-    if (existingRow.length > 0) {
-        // Update table row
-        existingRow.find('td').eq(1).text(`${firstName} ${lastName}`);
-        existingRow.find('td').eq(2).text(contactNo);
-        existingRow.find('td').eq(3).text(email);
-
-        // Update staff in the staffList array
-        const existingStaff = staffList.find(staff => staff.id === staffId);
-        if (existingStaff) {
-            Object.assign(existingStaff, {
-                firstName, lastName, designation, gender, joinedDate, dob,
-                contactNo, email, addressLine1, addressLine2, addressLine3,
-                addressLine4, addressLine5, role, fields, vehicle
-            });
-        }
-
-        // Send PUT request
-        $.ajax({
-            url: "http://localhost:5050/api/v1/staff",
-            type: "PUT",
-            contentType: "application/json",
-            data: jsonData,
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem('jwtToken')
-
-            },
-            success: function (response) {
-                console.log("Staff updated successfully:", response);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error updating staff:", status, error, xhr.responseText);
-            }
-        });
-
-    } else {
-
-        staffList.push(new StaffModel(staffId, firstName, lastName, designation, gender, joinedDate, dob,
+        const jsonData = JSON.stringify(new StaffModel(
+            staffId, firstName, lastName, designation, gender, joinedDate, dob,
             contactNo, email, addressLine1, addressLine2, addressLine3,
-            addressLine4, addressLine5, role, fields, vehicle));
+            addressLine4, addressLine5, role, fields, vehicle
+        ));
+
+        const existingRow = $(`#staffContainer tr[data-staff-id="${staffId}"]`);
+
+        // Update staff
+        if (existingRow.length > 0) {
+            // Update table row
+            existingRow.find('td').eq(1).text(`${firstName} ${lastName}`);
+            existingRow.find('td').eq(2).text(contactNo);
+            existingRow.find('td').eq(3).text(email);
+
+            // Update staff in the staffList array
+            const existingStaff = staffList.find(staff => staff.id === staffId);
+            if (existingStaff) {
+                Object.assign(existingStaff, {
+                    firstName, lastName, designation, gender, joinedDate, dob,
+                    contactNo, email, addressLine1, addressLine2, addressLine3,
+                    addressLine4, addressLine5, role, fields, vehicle
+                });
+            }
+
+            // Send PUT request
+            $.ajax({
+                url: "http://localhost:5050/api/v1/staff",
+                type: "PUT",
+                contentType: "application/json",
+                data: jsonData,
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem('jwtToken')
+
+                },
+                success: function (response) {
+                    console.log("Staff updated successfully:", response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error updating staff:", status, error, xhr.responseText);
+                }
+            });
+
+        } else {
+
+            staffList.push(new StaffModel(staffId, firstName, lastName, designation, gender, joinedDate, dob,
+                contactNo, email, addressLine1, addressLine2, addressLine3,
+                addressLine4, addressLine5, role, fields, vehicle));
 
 
-        $('#staffContainer').append(`
+            $('#staffContainer').append(`
             <tr data-staff-id="${staffId}">
                 <td>${staffId}</td>
                 <td>${firstName} ${lastName}</td>
@@ -170,28 +170,29 @@ $('#staffForm').on('submit', function (event) {
             </tr>
         `);
 
-        // Send POST request
-        $.ajax({
-            url: "http://localhost:5050/api/v1/staff",
-            type: "POST",
-            contentType: "application/json",
-            data: jsonData,
-            headers: {
-                "Authorization": "Bearer " + localStorage.getItem('jwtToken')
+            // Send POST request
+            $.ajax({
+                url: "http://localhost:5050/api/v1/staff",
+                type: "POST",
+                contentType: "application/json",
+                data: jsonData,
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem('jwtToken')
 
-            },
-            success: function (response) {
-                console.log("Staff added successfully:", response);
-            },
-            error: function (xhr, status, error) {
-                console.error("Error adding staff:", status, error, xhr.responseText);
-            }
-        });
+                },
+                success: function (response) {
+                    console.log("Staff added successfully:", response);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error adding staff:", status, error, xhr.responseText);
+                }
+            });
+        }
+
+
+        $('#staffForm')[0].reset();
+        $('#addStaffModal').modal('hide');
     }
-
-
-    $('#staffForm')[0].reset();
-    $('#addStaffModal').modal('hide');
 });
 
 $('#addNewStaff').on('click', function() {
@@ -279,87 +280,84 @@ $(document).on('click', '.view-details', function() {
 
 //Validation
 
-function validateStaff() {
+function validateForm() {
 
-    let isValid = true;
-    const errorMessage = [];
-
-    const staffId = $('#staffId').val();
-    const firstName = $('#firstName').val();
-    const lastName = $('#lastName').val();
-    const designation = $('#designation').val();
-     const gender = $('#gender').val();
-     const joinedDate = $('#joinedDate').val();
-     const dob = $('#dob').val();
+    const firstName = $('#firstName').val().trim();
+    const lastName = $('#lastName').val().trim();
+    const designation = $('#designation').val().trim();
+    const gender = $('#gender').val().trim();
+    const joinedDate = $('#joinedDate').val().trim();
+    const dob = $('#dob').val().trim();
     const addressLine1 = $('#addressLine1').val().trim();
     const addressLine2 = $('#addressLine2').val().trim();
     const addressLine3 = $('#addressLine3').val().trim();
     const addressLine4 = $('#addressLine4').val().trim();
     const addressLine5 = $('#addressLine5').val().trim();
-     const contactNo = $('#contactNo').val();
-     const email = $('#email').val();
-     const role = $('#role').val();
-     const fields = $('#fields').val();
-     const vehicle = $('#vehicle').val();
+    const contactNo = $('#contactNo').val().trim();
+    const email = $('#email').val().trim();
 
+    let isValid = true;
+    let errorMessage = '';
 
-
-     if (!staffId) {
-         errorMessage.push("Staff ID is required.");
-         isValid = false;
-     }
-
-
-     if (!firstName || !/^[a-zA-Z]+$/.test(firstName)) {
-         errorMessage.push("First name is required and should contain only letters.");
-         isValid = false;
-     }
-     if (!lastName || !/^[a-zA-Z]+$/.test(lastName)) {
-         errorMessage.push("Last name is required and should contain only letters.");
-         isValid = false;
-     }
-
-     if (!contactNo || !/^\d{10}$/.test(contactNo)) {
-         errorMessage.push("Contact number must be 10 digits.");
-         isValid = false;
-     }
-
-     if (!email || !/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/.test(email)) {
-         errorMessage.push("Valid email is required.");
-         isValid = false;
-     }
-
-     if (!joinedDate) {
-         errorMessage.push("Joined date is required.");
-         isValid = false;
-     }
-     if (!dob) {
-         errorMessage.push("Date of birth is required.");
-         isValid = false;
-     }
-
-     if (addressLine1) {
-         errorMessage.push("At least one line of the address is required.");
-         isValid = false;
-     }
-    if (addressLine2) {
-        errorMessage.push("At least one line of the address is required.");
+    if (!firstName) {
         isValid = false;
-    }
-    if (addressLine3) {
-        errorMessage.push("At least one line of the address is required.");
-        isValid = false;
-    }
-    if (addressLine4) {
-        errorMessage.push("At least one line of the address is required.");
-        isValid = false;
-    }
-    if (addressLine5) {
-        errorMessage.push("At least one line of the address is required.");
-        isValid =  false;
+        errorMessage += 'First name is required.\n';
     }
 
+    if (!lastName) {
+        isValid = false;
+        errorMessage += 'Last name is required.\n';
+    }
+
+    if (!designation) {
+        isValid = false;
+        errorMessage += 'Designation is required.\n';
+    }
+
+    if (!gender) {
+        isValid = false;
+        errorMessage += 'Gender is required.\n';
+    }
+
+    if (!joinedDate || !isValidDate(joinedDate)) {
+        isValid = false;
+        errorMessage += 'Joined date is required and must be a valid date (yyyy-mm-dd).\n';
+    }
+
+    if (!dob || !isValidDate(dob)) {
+        isValid = false;
+        errorMessage += 'Date of birth is required and must be a valid date (yyyy-mm-dd).\n';
+    }
+
+    if (!addressLine1 && !addressLine2 && !addressLine3 && !addressLine4 && !addressLine5) {
+        isValid = false;
+        errorMessage += 'At least one address line must be filled.\n';
+    }
+
+    if (!contactNo || !/^\d+$/.test(contactNo)) {
+        isValid = false;
+        errorMessage += 'Contact number is required and must contain only digits.\n';
+    }
+
+    if (!email || !validateEmail(email)) {
+        isValid = false;
+        errorMessage += 'A valid email address is required.\n';
+    }
+
+    if (!isValid) {
+        alert(errorMessage);
+    }
 
     return isValid;
+}
 
- }
+function isValidDate(dateString) {
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    return dateString.match(regex) !== null;
+}
+
+function validateEmail(email) {
+    const regex = /^(?![_.])([A-Za-z0-9._%+-]+)@([A-Za-z0-9.-]+\.[A-Za-z]{2,})$/;
+    return regex.test(email);
+}
+

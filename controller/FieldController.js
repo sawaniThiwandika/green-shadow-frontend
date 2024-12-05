@@ -44,13 +44,13 @@ $('#fieldForm').on('submit', function(event) {
     // formData.append('crops', JSON.stringify(crops));
     // formData.append('staff', JSON.stringify(staff));
 
-    // Check if fieldCode already exists
+
     const existingFieldIndex = fieldList.findIndex(field => field.fieldCode === fieldCode);
 
     if (existingFieldIndex !== -1) {
-        updateField(formData); // Call updateField for existing field
+        updateField(formData);
     } else {
-        saveField(formData); // Call saveField for new field
+        saveField(formData);
     }
 });
 // AJAX for save
