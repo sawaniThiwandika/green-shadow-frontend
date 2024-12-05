@@ -184,29 +184,35 @@ $(document).ready(function () {
 
     // Delete equipment
     $(document).on('click', '.delete-equipment', function () {
-        const row = $(this).closest('tr');
-        const equipmentId = row.data('id');
+        const equipmentId = $(this).data('id');
+        const equipment = equipmentList.find(eq => eq.equipmentId === equipmentId);
+        console.log("E id= "+equipment.equipmentId);
 
         // Remove from equipmentList
         const index = equipmentList.findIndex(eq => eq.equipmentId === equipmentId);
         if (index !== -1) equipmentList.splice(index, 1);
 
-        // Remove row from table
-        row.remove();
-
         // Send DELETE request to backend
         $.ajax({
             url: `http://localhost:5050/api/v1/equipment/${equipmentId}`,
-            type: "DELETE",
+            type: 'DELETE',
+            contentType: 'application/json',
             headers: {
-                "Authorization": "Bearer " + localStorage.getItem('jwtToken')
+                Authorization: `Bearer ${localStorage.getItem('jwtToken')}`,
+            },
 
-            },
+            data: JSON.stringify({ id: equipmentId }),
             success: function (response) {
-                console.log("Equipment deleted successfully:", response);
+                console.log("Equipment deleted successfully.");
+                console.log("Response:", response);
             },
-            error: function (xhr, status, error) {
-                console.error("Error deleting equipment:", status, error, xhr.responseText);
+            error: function (jqXHR, textStatus, errorThrown) {
+                console.error("Request failed:", textStatus, errorThrown);
+                console.error("Failed with status:", jqXHR.status);
+                console.error("Response Text:", jqXHR.responseText);
+            },
+            complete: function (jqXHR, textStatus) {
+                console.log("AJAX call completed with status:", textStatus);
             }
         });
     });
