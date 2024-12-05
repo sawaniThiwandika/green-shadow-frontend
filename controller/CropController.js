@@ -65,34 +65,36 @@ $(document).ready(function () {
     $('#cropForm').on('submit', function (event) {
         event.preventDefault();
         console.log("Selected fields when submit btn clicked:", selectedFieldListOfCrop);
+        if(validateForm()) {
 
-        const cropCode = $('#cropCode').val();
-        const commonName = $('#commonName').val();
-        const scientificName = $('#scientificName').val();
-        const category = $('#category').val();
-        const season = $('#season').val();
-        const file = $('#cropImage')[0].files[0];
+            const cropCode = $('#cropCode').val();
+            const commonName = $('#commonName').val();
+            const scientificName = $('#scientificName').val();
+            const category = $('#category').val();
+            const season = $('#season').val();
+            const file = $('#cropImage')[0].files[0];
 
-        if (!file) {
-            alert("Please upload an image");
-            return;
-        }
+            if (!file) {
+                alert("Please upload an image");
+                return;
+            }
 
-        const formData = new FormData();
-        formData.append('commonName', commonName);
-        formData.append('scientificName', scientificName);
-        formData.append('category', category);
-        formData.append('season', season);
-        formData.append('fieldDetails', JSON.stringify(selectedFieldListOfCrop)); // Send the field codes as JSON
-        formData.append('file', file);
+            const formData = new FormData();
+            formData.append('commonName', commonName);
+            formData.append('scientificName', scientificName);
+            formData.append('category', category);
+            formData.append('season', season);
+            formData.append('fieldDetails', JSON.stringify(selectedFieldListOfCrop)); // Send the field codes as JSON
+            formData.append('file', file);
 
-        // Check if the crop already exists
-        const existingCropIndex = cropList.findIndex(crop => crop.code === cropCode);
+            // Check if the crop already exists
+            const existingCropIndex = cropList.findIndex(crop => crop.code === cropCode);
 
-        if (existingCropIndex !== -1) {
-            updateCrop(cropCode,formData); // Update existing crop
-        } else {
-            saveCrop(formData); // Save new crop
+            if (existingCropIndex !== -1) {
+                updateCrop(cropCode, formData); // Update existing crop
+            } else {
+                saveCrop(formData); // Save new crop
+            }
         }
     });
 
@@ -113,6 +115,7 @@ $(document).ready(function () {
                 $('#cropForm')[0].reset(); // Reset form after saving
                 $('#addCropModal').modal('hide');
                 $('#submitCrop').text('Add Crop');
+                fieldManager.loadCrop();
             },
             error: function (xhr, status, error) {
                 console.error("Error saving crop:", error);
@@ -137,6 +140,7 @@ $(document).ready(function () {
                 $('#cropForm')[0].reset(); // Reset form after updating
                 $('#addCropModal').modal('hide');
                 $('#submitCrop').text('Add Crop');
+                fieldManager.loadCrop();
             },
             error: function (xhr, status, error) {
                 console.error("Error updating crop:", error);
@@ -325,11 +329,7 @@ function validateForm() {
     if (cropImage.trim() === '') {
         alert("Image URL is required");
         isValid = false;
-    } else if (!isValidUrl(cropImage)) {
-        alert("Please enter a valid URL for the image");
-        isValid = false;
     }
-
 
     const category = $('#category').val();
     if (category.trim() === '') {
@@ -345,17 +345,8 @@ function validateForm() {
     }
 
 
-    const fieldDetails = $('#fieldDetails').val();
-    if (fieldDetails.trim() === '') {
-        alert("Field Details are required");
-        isValid = false;
-    }
-
     return isValid;
 }
 
 
-function isValidUrl(url) {
-    const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?$/;
-    return urlPattern.test(url);
-}
+

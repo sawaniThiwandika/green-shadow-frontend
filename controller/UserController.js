@@ -136,7 +136,7 @@ $(document).ready(function () {
 
 
             $.ajax({
-                url: `http://localhost:5050/api/v1/user/${userEmail}`, // API endpoint for update
+                url: `http://localhost:5050/api/v1/user/${userEmail}`,
                 type: "PUT",
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem('jwtToken')
@@ -159,12 +159,11 @@ $(document).ready(function () {
     $(document).on('click', '.delete-user', function () {
         const userIndex = $(this).data('index');
 
-        // Fetch user email
         const userEmail = $("#userTable").find(`tr:eq(${userIndex + 1})`).find("td:eq(0)").text();
 
         if (confirm(`Are you sure you want to delete the user ${userEmail}?`)) {
             $.ajax({
-                url: `http://localhost:5050/api/v1/user/${userEmail}`, // API endpoint for delete
+                url: `http://localhost:5050/api/v1/user/${userEmail}`,
                 type: "DELETE",
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('jwtToken')}`
