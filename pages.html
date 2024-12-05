@@ -704,6 +704,40 @@
                 </div>
             </div>
         </div>
+        <!--update userModal-->
+        <div class="modal fade" id="updateUserModal" tabindex="-1" aria-labelledby="updateUserModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateUserModalLabel">Update User</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="updateUserForm">
+                            <div class="mb-3">
+                                <label for="updateUserEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="updateUserEmail" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateUserPassword" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="updateUserPassword" placeholder="Enter password" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateUserRole" class="form-label">Role</label>
+                                <select class="form-control" id="updateUserRole">
+                                    <option value="MANAGER">Manager</option>
+                                    <option value="ADMINISTRATIVE">Administrative</option>
+                                    <option value="SCIENTIST">Scientist</option>
+                                    <option value="OTHER">Other</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Update User</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </section>
 
 
